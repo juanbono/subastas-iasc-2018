@@ -6,12 +6,14 @@ defmodule Exchange.Application do
   use Application
 
   def start(_type, _args) do
+    port = Application.fetch_env!(:exchange, :port)
+
     # List all child processes to be supervised
     children = [
       Plug.Adapters.Cowboy2.child_spec(
         scheme: :http,
         plug: Exchange.Router,
-        options: [port: 4001]
+        options: [port: port]
       )
     ]
 
