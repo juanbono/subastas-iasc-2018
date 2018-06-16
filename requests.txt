@@ -1,0 +1,9 @@
+# request para probar /buyers
+curl -H "Content-Type: application/json" \
+     -d '{"name":"name1", "ip":"192.168.1.1", "tags":["cats"]}' \
+     http://localhost:4001/buyers
+
+# request para probar /bids
+curl -H "Content-Type: application/json" \
+     -d '{"tags":["cats", "pets"], "price": 2.0, "duration": 5000, "json": {"id": 12, "name": "mimisho"}}' \
+     http://localhost:4001/bids
