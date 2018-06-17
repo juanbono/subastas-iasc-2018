@@ -1,9 +1,9 @@
-defmodule Exchange.MixProject do
+defmodule Client.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :exchange,
+      app: :client,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -19,7 +19,7 @@ defmodule Exchange.MixProject do
   def application do
     [
       extra_applications: [:logger, :cowboy, :plug, :httpoison],
-      mod: {Exchange.Application, []}
+      mod: {Client.Application, []}
     ]
   end
 

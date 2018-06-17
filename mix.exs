@@ -15,6 +15,11 @@ defmodule Subastas.MixProject do
   #
   # Run "mix help deps" for examples and options.
   defp deps do
-    [{:cowboy, "~> 2.4.0"}, {:plug, "~> 1.5.1"}, {:poison, "~> 3.1"}]
+    [
+      {:cowboy, "~> 2.4.0"},
+      {:plug, "~> 1.5.1"},
+      {:poison, "~> 3.1"},
+      {:httpoison, "~> 1.2.0"}
+    ]
   end
 end
