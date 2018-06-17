@@ -8,7 +8,18 @@ defmodule Exchange.Router do
 
   post "/buyers" do
     if is_valid_buyer?(conn) do
-      send_resp(conn, 200, "Registration Completed! \n")
+      with {:ok, count} <- Exchange.Buyers.register(conn.body_params) do
+        send_resp(conn, 200, "Welcome! There is #{count} buyers in the exchange.\n")
+      else
+        {:error, :name_not_unique} ->
+          send_resp(conn, 400, "Error: The name is already in use.\n")
+
+        {:error, :no_space} ->
+          send_resp(conn, 400, "Error: There is no space in the exchange.\n")
+
+        {:error, reason} ->
+          send_resp(conn, 400, "Error: #{reason}\n")
+      end
     else
       send_resp(conn, 400, "Invalid request. \n")
     end

@@ -14,7 +14,8 @@ defmodule Exchange.Application do
         scheme: :http,
         plug: Exchange.Router,
         options: [port: port]
-      )
+      ),
+      {DynamicSupervisor, name: Exchange.Buyers.Supervisor, strategy: :one_for_one}
     ]
 
     opts = [strategy: :one_for_one, name: Exchange.Supervisor]
