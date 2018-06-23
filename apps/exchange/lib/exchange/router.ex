@@ -9,28 +9,39 @@ defmodule Exchange.Router do
   post "/buyers" do
     if is_valid_buyer?(conn) do
       with {:ok, count} <- Exchange.Buyers.register(conn.body_params) do
-        send_resp(conn, 200, "Welcome! There is #{count} buyers in the exchange.\n")
+        send_resp(conn, 200, "Buyer added succesfully! Buyers: #{count}.")
       else
         {:error, :name_not_unique} ->
-          send_resp(conn, 400, "Error: The name is already in use.\n")
+          send_resp(conn, 400, "Error: The name is already in use.")
 
         {:error, :no_space} ->
-          send_resp(conn, 400, "Error: There is no space in the exchange.\n")
+          send_resp(conn, 400, "Error: There is no space in the exchange.")
 
         {:error, reason} ->
-          send_resp(conn, 400, "Error: #{reason}\n")
+          send_resp(conn, 400, "Error: #{reason}")
       end
     else
-      send_resp(conn, 400, "Invalid request. \n")
+      send_resp(conn, 400, "Invalid request.")
     end
   end
 
   post "/bids" do
     if is_valid_bid?(conn) do
-      Exchange.send_bid_to_buyers(conn.body_params)
-      send_resp(conn, 200, "Bid added succesfully!\n")
+      with {:ok, count} <- Exchange.Bids.register(conn.body_params) do
+        Exchange.send_bid_to_buyers(conn.body_params)
+        send_resp(conn, 200, "Bid added succesfully! Bids: #{count}")
+      else
+        {:error, :invalid_duration} ->
+          send_resp(conn, 400, "Error: Invalid duration.")
+
+        {:error, :no_space} ->
+          send_resp(conn, 400, "Error: There is no space in the exchange.")
+
+        {:error, reason} ->
+          send_resp(conn, 400, "Error: #{reason}")
+      end
     else
-      send_resp(conn, 400, "Invalid bid. \n")
+      send_resp(conn, 400, "Invalid bid.")
     end
   end
 
