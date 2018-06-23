@@ -8,14 +8,24 @@ defmodule Exchange.Application do
   def start(_type, _args) do
     port = Application.fetch_env!(:exchange, :port)
 
-    # List all child processes to be supervised
-    children = [
+    plug_spec =
       Plug.Adapters.Cowboy2.child_spec(
         scheme: :http,
         plug: Exchange.Router,
         options: [port: port]
-      ),
+      )
+
+    buyers_supervisor_spec =
       {DynamicSupervisor, name: Exchange.Buyers.Supervisor, strategy: :one_for_one}
+
+    bids_supervisor_spec =
+      {DynamicSupervisor, name: Exchange.Bids.Supervisor, strategy: :one_for_one}
+
+    # List all child processes to be supervised
+    children = [
+      plug_spec,
+      buyers_supervisor_spec,
+      bids_supervisor_spec
     ]
 
     opts = [strategy: :one_for_one, name: Exchange.Supervisor]
