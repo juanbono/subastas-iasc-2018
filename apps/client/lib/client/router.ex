@@ -7,6 +7,7 @@ defmodule Client.Router do
   plug(:dispatch)
 
   post "/notify" do
+    IO.inspect("Recibido bid")
     send_resp(conn, 200, "event received \n")
   end
 

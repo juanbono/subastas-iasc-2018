@@ -17,8 +17,11 @@ defmodule Exchange.Buyers.Worker do
   end
 
   def handle_cast({:new_bid, bid}, %{"ip" => ip} = state) do
-    # enviar la bid a la ip del comprador
-    IO.inspect("Enviando bid con tags #{bid["tags"]} a: #{ip}\n")
+    json_bid = Poison.encode!(bid)
+
+    res = HTTPoison.post!(ip <> "/notify", json_bid, [{"content-type", "application/json"}])
+
+    IO.inspect(res.body, label: "response body")
     {:noreply, state}
   end
 
