@@ -5,7 +5,7 @@ defmodule Exchange do
   Notifica a cada uno de los compradores actuales una `apuesta` dada.
   """
   def send_bid_to_buyers(bid) do
-    Buyers.get_current_buyers()
+    Buyers.current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify(pid, bid) end)
   end
 end
