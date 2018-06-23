@@ -1,18 +1,11 @@
 defmodule Exchange do
-  @moduledoc """
-  Documentation for Exchange.
-  """
+  alias Exchange.Buyers
 
   @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Exchange.hello
-      :world
-
+  Notifica a cada uno de los compradores actuales una `apuesta` dada.
   """
-  def hello do
-    :world
+  def send_bid_to_buyers(bid) do
+    Buyers.get_current_buyers()
+    |> Enum.each(fn pid -> Buyers.Worker.notify(pid, bid) end)
   end
 end

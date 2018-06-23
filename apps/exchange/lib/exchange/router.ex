@@ -27,6 +27,7 @@ defmodule Exchange.Router do
 
   post "/bids" do
     if is_valid_bid?(conn) do
+      Exchange.send_bid_to_buyers(conn.body_params)
       send_resp(conn, 200, "Bid added succesfully!\n")
     else
       send_resp(conn, 400, "Invalid bid. \n")

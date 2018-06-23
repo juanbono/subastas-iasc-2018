@@ -18,7 +18,7 @@ defmodule Exchange.Buyers.Worker do
 
   def handle_cast({:new_bid, bid}, %{"ip" => ip} = state) do
     # enviar la bid a la ip del comprador
-    IO.inspect("Enviando bid con tags #{bid.tags} a: #{ip}\n")
+    IO.inspect("Enviando bid con tags #{bid["tags"]} a: #{ip}\n")
     {:noreply, state}
   end
 

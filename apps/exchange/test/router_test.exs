@@ -15,7 +15,7 @@ defmodule Exchange.RouterTest do
 
     assert conn.state == :sent
     assert conn.status == 200
-    assert conn.resp_body == "Registration Completed! \n"
+    assert conn.resp_body == "Welcome! There is 1 buyers in the exchange.\n"
   end
 
   test "/buyers fails to register when the information is incomplete" do
