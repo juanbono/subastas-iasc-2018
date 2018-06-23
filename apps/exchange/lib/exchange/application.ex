@@ -24,8 +24,8 @@ defmodule Exchange.Application do
     # List all child processes to be supervised
     children = [
       plug_spec,
-      buyers_supervisor_spec,
-      bids_supervisor_spec
+      Supervisor.child_spec(buyers_supervisor_spec, id: :buyers_supervisor),
+      Supervisor.child_spec(bids_supervisor_spec, id: :bids_supervisor)
     ]
 
     opts = [strategy: :one_for_one, name: Exchange.Supervisor]
