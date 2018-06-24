@@ -17,4 +17,8 @@ defmodule Exchange.Bids do
   def number_of_bids() do
     DynamicSupervisor.count_children(Bids.Supervisor).workers
   end
+
+  def exists?(bid_id) do
+    # check if the given bid exists
+  end
 end
