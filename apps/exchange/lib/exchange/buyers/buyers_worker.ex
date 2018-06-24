@@ -17,11 +17,12 @@ defmodule Exchange.Buyers.Worker do
   end
 
   def handle_cast({:new_bid, bid}, %{"ip" => ip} = state) do
-    json_bid = Poison.encode!(bid)
+    if has_tags_in_common?(bid["tags"], state["tags"]) do
+      json_bid = Poison.encode!(bid)
+      res = HTTPoison.post!(ip <> "/notify", json_bid, [{"content-type", "application/json"}])
+      IO.inspect(res.body, label: "response body")
+    end
 
-    res = HTTPoison.post!(ip <> "/notify", json_bid, [{"content-type", "application/json"}])
-
-    IO.inspect(res.body, label: "response body")
     {:noreply, state}
   end
 
@@ -36,5 +37,10 @@ defmodule Exchange.Buyers.Worker do
   """
   def notify(pid, bid) do
     GenServer.cast(pid, {:new_bid, bid})
+  end
+
+  defp has_tags_in_common?(bid_tags, buyer_tags) do
+    bid_tags
+    |> Enum.any?(fn tag -> Enum.member?(buyer_tags, tag) end)
   end
 end

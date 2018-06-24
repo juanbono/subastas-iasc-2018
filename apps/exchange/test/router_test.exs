@@ -15,7 +15,7 @@ defmodule Exchange.RouterTest do
 
     assert conn.state == :sent
     assert conn.status == 200
-    assert conn.resp_body == "Welcome! There is 1 buyers in the exchange.\n"
+    assert conn.resp_body == "Buyer added succesfully! Buyers: 1.\n"
   end
 
   test "/buyers fails to register when the information is incomplete" do
@@ -29,7 +29,7 @@ defmodule Exchange.RouterTest do
 
     assert conn.state == :sent
     assert conn.status == 400
-    assert conn.resp_body == "Invalid request. \n"
+    assert conn.resp_body == "Invalid request.\n"
   end
 
   test "/bids creates the bid succesfully" do
@@ -43,7 +43,7 @@ defmodule Exchange.RouterTest do
 
     assert conn.state == :sent
     assert conn.status == 200
-    assert conn.resp_body == "Bid added succesfully!\n"
+    assert conn.resp_body == "Bid added succesfully! Bids: 1.\n"
   end
 
   test "/bids fails when there is no json article" do
@@ -57,6 +57,6 @@ defmodule Exchange.RouterTest do
 
     assert conn.state == :sent
     assert conn.status == 400
-    assert conn.resp_body == "Invalid bid. \n"
+    assert conn.resp_body == "Invalid bid.\n"
   end
 end
