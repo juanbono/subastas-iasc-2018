@@ -9,51 +9,53 @@ defmodule Exchange.Router do
   post "/buyers" do
     case Exchange.Buyers.process(conn.body_params) do
       {:ok, count} ->
-        send_resp(conn, 200, "Buyer added succesfully! Buyers: #{count}.\n")
+        send_json_resp(:created, conn, "Buyer added succesfully! Buyers: #{count}")
 
       {:error, :name_not_unique} ->
-        send_resp(conn, 400, "Error: The name is already in use.\n")
+        send_json_resp(:unprocessable_entity, conn, "The name is already in use")
 
+      # TODO: generalizar este caso en todos los endpoints
       {:error, :no_space} ->
-        send_resp(conn, 400, "Error: There is no space in the exchange.\n")
+        send_json_resp(:internal_server_error, conn, "There is no space in the exchange")
 
+      # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_json} ->
-        send_resp(conn, 400, "Error: Invalid JSON.\n")
+        send_json_resp(:bad_request, conn, "Invalid JSON")
 
       {:error, reason} ->
-        send_resp(conn, 400, "Error: #{reason}\n")
+        send_json_resp(:bad_request, conn, reason)
     end
   end
 
   post "/bids" do
     case Exchange.Bids.process(:bid, conn.body_params) do
       {:ok, count} ->
-        send_resp(conn, 200, "Bid added succesfully! Bids: #{count}.\n")
+        send_json_resp(:created, conn, "Bid added succesfully! Bids: #{count}")
 
-      {:error, :invalid_duration} ->
-        send_resp(conn, 400, "Error: Invalid duration.\n")
+      {:error, :name_not_unique} ->
+        send_json_resp(:unprocessable_entity, conn, "Invalid duration")
 
+      # TODO: generalizar este caso en todos los endpoints
       {:error, :no_space} ->
-        send_resp(conn, 400, "Error: There is no space in the exchange.\n")
+        send_json_resp(:internal_server_error, conn, "There is no space in the exchange")
 
       {:error, reason} ->
-        send_resp(conn, 400, "Error: #{reason}\n")
+        send_json_resp(:bad_request, conn, reason)
     end
   end
 
   post "/bids/:id/offer" do
     case Exchange.Bids.process(:offer, conn.body_params) do
       {:ok, new_price} ->
-        send_resp(conn, 200, "New price accepted. Price: #{new_price}.\n")
+        send_json_resp(:ok, conn, "New price accepted. Price: #{new_price}")
 
       {:error, _reason} ->
-        send_resp(conn, 400, "Invalid bid.\n")
+        send_json_resp(:bad_request, conn, "Invalid bid")
     end
   end
 
   match _ do
-    error_msg = "Wrong endpoint.\n Valid endpoints: '/buyers' and '/bids'\n"
-    send_resp(conn, 404, error_msg)
+    send_json_resp(:not_found, conn, "Valid endpoints: '/buyers' and '/bids'")
   end
 
   ######################
@@ -103,4 +105,47 @@ defmodule Exchange.Router do
   defp has_price(conn), do: Map.has_key?(conn.body_params, "price")
   defp has_duration(conn), do: Map.has_key?(conn.body_params, "duration")
   defp has_json(conn), do: Map.has_key?(conn.body_params, "json")
+
+  # TODO: mandar a un modulo aparte
+  def send_json_resp(:ok, conn, body) do
+    conn |> send_json_resp_by(200, %{
+      message: body
+    })
+  end
+
+  def send_json_resp(:created, conn, body) do
+    conn |> send_json_resp_by(201, %{
+      message: body
+    })
+  end
+
+  def send_json_resp(:bad_request, conn, body) do
+    conn |> send_json_resp_by(400, %{
+      error: body
+    })
+  end
+
+  def send_json_resp(:not_found, conn, body) do
+    conn |> send_json_resp_by(404, %{
+      error: body
+    })
+  end
+
+  def send_json_resp(:unprocessable_entity, conn, body) do
+    conn |> send_json_resp_by(422, %{
+      error: body
+    })
+  end
+
+  def send_json_resp(:internal_server_error, conn, body) do
+    conn |> send_json_resp_by(500, %{
+      error: body
+    })
+  end
+
+  def send_json_resp_by(conn, status, body) do
+    conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(status, Poison.encode!(body))
+  end
 end

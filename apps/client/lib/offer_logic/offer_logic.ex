@@ -1,10 +1,8 @@
 defmodule Client.OfferLogic do
   def process(body_params) do
     if offer?(body_params) do
-      id = to_string(body_params["id"])
-
       send_offer(
-        url(id),
+        url(body_params["id"]),
         offer_params(body_params)
       )
     end
@@ -15,7 +13,7 @@ defmodule Client.OfferLogic do
   end
 
   def url(id) do
-    "http://localhost:4000/bids/" <> id <> "/offers"
+    "http://localhost:4000/bids/#{id}/offers"
   end
 
   def offer_params(body_params) do
