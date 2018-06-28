@@ -19,7 +19,9 @@ defmodule Subastas.MixProject do
       {:cowboy, "~> 2.4.0"},
       {:plug, "~> 1.5.1"},
       {:poison, "~> 3.1"},
-      {:httpoison, "~> 1.2.0"}
+      {:httpoison, "~> 1.2.0"},
+      {:amnesia, "~> 0.2.7"},
+      {:unsplit, git: "https://github.com/discordapp/unsplit"}
     ]
   end
 end
