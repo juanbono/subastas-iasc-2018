@@ -2,6 +2,7 @@ defmodule Exchange.Bids.Bid do
   @moduledoc """
 
   """
+
   @enforce_keys [:price, :duration, :json, :tags]
   defstruct price: 0, duration: 0, json: %{}, tags: []
 
@@ -21,9 +22,7 @@ defmodule Exchange.Bids.Bid do
   @doc """
   Devuelve una `apuesta` vacia.
   """
-  def empty() do
-    %__MODULE__{price: nil, duration: nil, json: nil, tags: nil}
-  end
+  def empty(), do: %__MODULE__{price: nil, duration: nil, json: nil, tags: nil}
 
   defp check_price({:error, _reason} = err, _params), do: err
 
