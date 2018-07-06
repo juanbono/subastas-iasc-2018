@@ -11,16 +11,16 @@ defmodule Exchange.Router do
       {:ok, count} ->
         send_json_resp(conn, :created, "Buyer added succesfully! Buyers: #{count}")
 
-      {:error, :name_not_unique} ->
+      {:error, :invalid_name} ->
         send_json_resp(conn, :unprocessable_entity, "The name is already in use")
 
       # TODO: generalizar este caso en todos los endpoints
-      {:error, :no_space} ->
-        send_json_resp(conn, :internal_server_error, "There is no space in the exchange")
+      {:error, :invalid_ip} ->
+        send_json_resp(conn, :internal_server_error, "Invalid IP")
 
       # TODO: generalizar este caso en todos los endpoints
-      {:error, :invalid_json} ->
-        send_json_resp(conn, :bad_request, "Invalid request")
+      {:error, :invalid_tags} ->
+        send_json_resp(conn, :bad_request, "Invalid tags.")
 
       {:error, reason} ->
         send_json_resp(conn, :bad_request, reason)
@@ -112,44 +112,50 @@ defmodule Exchange.Router do
 
   # TODO: mandar a un modulo aparte
   def send_json_resp(conn, :ok, body) do
-    conn |> send_json_resp_by(200, %{
+    conn
+    |> send_json_resp_by(200, %{
       message: body
     })
   end
 
   def send_json_resp(conn, :created, body) do
-    conn |> send_json_resp_by(201, %{
+    conn
+    |> send_json_resp_by(201, %{
       message: body
     })
   end
 
   def send_json_resp(conn, :bad_request, body) do
-    conn |> send_json_resp_by(400, %{
+    conn
+    |> send_json_resp_by(400, %{
       error: body
     })
   end
 
   def send_json_resp(conn, :not_found, body) do
-    conn |> send_json_resp_by(404, %{
+    conn
+    |> send_json_resp_by(404, %{
       error: body
     })
   end
 
   def send_json_resp(conn, :unprocessable_entity, body) do
-    conn |> send_json_resp_by(422, %{
+    conn
+    |> send_json_resp_by(422, %{
       error: body
     })
   end
 
   def send_json_resp(conn, :internal_server_error, body) do
-    conn |> send_json_resp_by(500, %{
+    conn
+    |> send_json_resp_by(500, %{
       error: body
     })
   end
 
   def send_json_resp_by(conn, status, body) do
     conn
-      |> put_resp_content_type("application/json")
-      |> send_resp(status, Poison.encode!(body))
+    |> put_resp_content_type("application/json")
+    |> send_resp(status, Poison.encode!(body))
   end
 end

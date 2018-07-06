@@ -19,7 +19,7 @@ defmodule Exchange.Buyers.Buyer do
   end
 
   @doc """
-  Devuelve un `comprador` vacio.
+  Crea un `comprador` vacio.
   """
   def empty(), do: %__MODULE__{ip: nil, name: nil, tags: nil}
 
@@ -38,14 +38,16 @@ defmodule Exchange.Buyers.Buyer do
   defp check_name({:error, _reason} = err, _params), do: err
 
   defp check_name(buyer, params) do
-    case Map.fetch(params, "name") do
-      # checkear si esta disponible el nombre
-
-      {:ok, name} when is_binary(name) ->
-        Map.put(buyer, :name, name)
-
-      _error ->
+    with {:ok, name} when is_binary(name) <- Map.fetch(params, "name"),
+         :ok <- check_name_availability(name) do
+      Map.put(buyer, :name, name)
+    else
+      :invalid_name ->
         {:error, :invalid_name}
+
+      # podemos manejar aca el caso en el que el server no tiene espacio?
+      error ->
+        error
     end
   end
 
@@ -58,6 +60,18 @@ defmodule Exchange.Buyers.Buyer do
 
       _error ->
         {:error, :invalid_tags}
+    end
+  end
+
+  defp check_name_availability(name) do
+    buyers =
+      Exchange.Buyers.current_buyers()
+      |> Enum.map(fn buyer -> Exchange.Buyers.Worker.name(buyer) end)
+
+    if Enum.member?(buyers, name) do
+      :invalid_name
+    else
+      :ok
     end
   end
 end
