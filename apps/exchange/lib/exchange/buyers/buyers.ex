@@ -1,17 +1,17 @@
 defmodule Exchange.Buyers do
-  use Exchange.Validator, :buyers
   alias Exchange.Buyers
+  alias Exchange.Buyers.Buyer
 
-  def process(payload) do
-    case valid?(payload) do
-      {:ok, buyer} -> register(buyer)
-      {:error, _} -> {:error, :invalid_json}
-    end
+  def process(params) do
+    Buyer.make(params)
+    |> register()
   end
 
   @doc """
   Registra un comprador en el sistema.
   """
+  def register({:error, _} = error), do: error
+
   def register(buyer) do
     DynamicSupervisor.start_child(Buyers.Supervisor, {Buyers.Worker, buyer})
     {:ok, number_of_buyers()}

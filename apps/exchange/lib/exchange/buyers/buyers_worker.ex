@@ -26,6 +26,10 @@ defmodule Exchange.Buyers.Worker do
     {:noreply, state}
   end
 
+  def handle_call({:get_name}, _from, %{name: name} = state) do
+    {:reply, name, state}
+  end
+
   #######################
   ## Funciones Cliente ##
   #######################
@@ -35,6 +39,11 @@ defmodule Exchange.Buyers.Worker do
   Para ello envia los datos de la apuesta al endpoint `/notify`
   del comprador.
   """
+
+  def name(buyer_pid) do
+    GenServer.call(buyer_pid, {:get_name})
+  end
+
   def notify(pid, bid) do
     GenServer.cast(pid, {:new_bid, bid})
   end
