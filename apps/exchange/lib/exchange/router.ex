@@ -1,5 +1,6 @@
 defmodule Exchange.Router do
   use Plug.Router
+  alias Exchange.{Buyers, Bids}
 
   plug(Plug.Logger)
   plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
@@ -7,17 +8,17 @@ defmodule Exchange.Router do
   plug(:dispatch)
 
   post "/buyers" do
-    Exchange.Buyers.process(conn.body_params)
+    Buyers.process(conn.body_params)
     |> handle_response(:buyers_endpoint, conn)
   end
 
   post "/bids" do
-    Exchange.Bids.process(:bid, conn.body_params)
+    Bids.process(:bid, conn.body_params)
     |> handle_response(:bids_endpoint, conn)
   end
 
   post "/bids/:id/offer" do
-    case Exchange.Bids.process(:offer, conn.body_params) do
+    case Bids.process(:offer, conn.body_params) do
       {:ok, new_price} ->
         send_json_resp(conn, :ok, "New price accepted. Price: #{new_price}")
 
@@ -74,27 +75,6 @@ defmodule Exchange.Router do
         send_json_resp(conn, :bad_request, reason)
     end
   end
-
-  def is_valid_offer?(id, conn) do
-    valid_id = has_valid_id(id)
-
-    valid_conn =
-      [&has_name/1, &has_price/1]
-      |> is_valid?(conn)
-
-    valid_id && valid_conn
-  end
-
-  defp is_valid?(predicates, conn),
-    do: Enum.all?(predicates, fn pred -> pred.(conn) end)
-
-  defp has_valid_id(id), do: Exchange.Bids.exists?(id)
-  defp has_name(conn), do: Map.has_key?(conn.body_params, "name")
-  defp has_ip(conn), do: Map.has_key?(conn.body_params, "ip")
-  defp has_tags(conn), do: Map.has_key?(conn.body_params, "tags")
-  defp has_price(conn), do: Map.has_key?(conn.body_params, "price")
-  defp has_duration(conn), do: Map.has_key?(conn.body_params, "duration")
-  defp has_json(conn), do: Map.has_key?(conn.body_params, "json")
 
   # TODO: mandar a un modulo aparte
   def send_json_resp(conn, :ok, body) do

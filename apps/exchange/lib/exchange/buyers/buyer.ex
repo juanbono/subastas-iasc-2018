@@ -2,6 +2,7 @@ defmodule Exchange.Buyers.Buyer do
   @moduledoc """
 
   """
+  alias Exchange.Buyers
 
   @enforce_keys [:ip, :name, :tags]
   defstruct ip: "", name: "", tags: []
@@ -65,8 +66,8 @@ defmodule Exchange.Buyers.Buyer do
 
   defp check_name_availability(name) do
     buyers =
-      Exchange.Buyers.current_buyers()
-      |> Enum.map(fn buyer -> Exchange.Buyers.Worker.name(buyer) end)
+      Buyers.current_buyers()
+      |> Enum.map(fn buyer -> Buyers.Worker.name(buyer) end)
 
     if Enum.member?(buyers, name) do
       :invalid_name
