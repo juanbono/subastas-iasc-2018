@@ -51,11 +51,10 @@ defmodule Exchange.Bids.Bid do
   defp check_json({:error, _reason} = err, _params), do: err
 
   defp check_json(bid, params) do
-    case Map.fetch(params, "json") do
-      {:ok, json} ->
-        Map.put(bid, :json, json)
-
-      :error ->
+    with {:ok, json} <- Map.fetch(params, "json") do
+      Map.put(bid, :json, json)
+    else
+      _error ->
         {:error, :invalid_json}
     end
   end

@@ -7,45 +7,13 @@ defmodule Exchange.Router do
   plug(:dispatch)
 
   post "/buyers" do
-    case Exchange.Buyers.process(conn.body_params) do
-      {:ok, count} ->
-        send_json_resp(conn, :created, "Buyer added succesfully! Buyers: #{count}")
-
-      {:error, :invalid_name} ->
-        send_json_resp(conn, :unprocessable_entity, "The name is already in use")
-
-      # TODO: generalizar este caso en todos los endpoints
-      {:error, :invalid_ip} ->
-        send_json_resp(conn, :internal_server_error, "Invalid IP")
-
-      # TODO: generalizar este caso en todos los endpoints
-      {:error, :invalid_tags} ->
-        send_json_resp(conn, :bad_request, "Invalid tags.")
-
-      {:error, reason} ->
-        send_json_resp(conn, :bad_request, reason)
-    end
+    Exchange.Buyers.process(conn.body_params)
+    |> handle_response(:buyers_endpoint, conn)
   end
 
   post "/bids" do
-    case Exchange.Bids.process(:bid, conn.body_params) do
-      {:ok, count} ->
-        send_json_resp(conn, :created, "Bid added succesfully! Bids: #{count}")
-
-      {:error, :name_not_unique} ->
-        send_json_resp(conn, :unprocessable_entity, "Invalid duration")
-
-      # TODO: generalizar este caso en todos los endpoints
-      {:error, :no_space} ->
-        send_json_resp(conn, :internal_server_error, "There is no space in the exchange")
-
-      # TODO: generalizar este caso en todos los endpoints
-      {:error, :invalid_json} ->
-        send_json_resp(conn, :bad_request, "Invalid request")
-
-      {:error, reason} ->
-        send_json_resp(conn, :bad_request, reason)
-    end
+    Exchange.Bids.process(:bid, conn.body_params)
+    |> handle_response(:bids_endpoint, conn)
   end
 
   post "/bids/:id/offer" do
@@ -66,27 +34,45 @@ defmodule Exchange.Router do
   ## Helper Functions ##
   ######################
 
-  @doc """
-  Un comprador válido debe proporcionar:
-    * Un `nombre` lógico.
-    * Su dirección `IP`.
-    * Una lista con los `tags` de su interés.
-  """
-  def is_valid_buyer?(conn) do
-    [&has_name/1, &has_ip/1, &has_tags/1]
-    |> is_valid?(conn)
+  defp handle_response(result, :bids_endpoint, conn) do
+    case result do
+      {:ok, count} ->
+        send_json_resp(conn, :created, "Bid added succesfully! Bids: #{count}")
+
+      {:error, :invalid_duration} ->
+        send_json_resp(conn, :unprocessable_entity, "Invalid duration")
+
+      # TODO: generalizar este caso en todos los endpoints
+      {:error, :invalid_json} ->
+        send_json_resp(conn, :bad_request, "Invalid request")
+
+      {:error, :invalid_tags} ->
+        send_json_resp(conn, :bad_request, "Invalid tags")
+
+      {:error, reason} ->
+        send_json_resp(conn, :bad_request, reason)
+    end
   end
 
-  @doc """
-  Una apuesta válida debe tener:
-    * Una lista de `tags`.
-    * Su `precio` base (que puede ser 0).
-    * La `duración` máxima de la subasta (expresada en ms).
-    * Un `JSON` con la información del articulo.
-  """
-  def is_valid_bid?(conn) do
-    [&has_tags/1, &has_price/1, &has_duration/1, &has_json/1]
-    |> is_valid?(conn)
+  defp handle_response(result, :buyers_endpoint, conn) do
+    case result do
+      {:ok, count} ->
+        send_json_resp(conn, :created, "Buyer added succesfully! Buyers: #{count}")
+
+      {:error, :invalid_name} ->
+        send_json_resp(conn, :unprocessable_entity, "The name is already in use")
+
+      # TODO: generalizar este caso en todos los endpoints
+      {:error, :invalid_ip} ->
+        send_json_resp(conn, :internal_server_error, "Invalid IP")
+
+      # TODO: generalizar este caso en todos los endpoints
+      {:error, :invalid_tags} ->
+        send_json_resp(conn, :bad_request, "Invalid tags")
+
+      {:error, reason} ->
+        send_json_resp(conn, :bad_request, reason)
+    end
   end
 
   def is_valid_offer?(id, conn) do

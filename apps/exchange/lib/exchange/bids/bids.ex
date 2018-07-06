@@ -1,12 +1,11 @@
 defmodule Exchange.Bids do
   use Exchange.Validator, :bids
   alias Exchange.Bids
+  alias Exchange.Bids.Bid
 
-  def process(:bid, payload) do
-    case valid?(payload) do
-      {:ok, bid} -> register(bid)
-      {:error, _} -> {:error, :invalid_json}
-    end
+  def process(:bid, params) do
+    Bid.make(params)
+    |> register()
   end
 
   def process(:offer, payload) do
@@ -19,6 +18,8 @@ defmodule Exchange.Bids do
   @doc """
   Registra una apuesta en el sistema.
   """
+  def register({:error, _} = error), do: error
+
   def register(bid) do
     DynamicSupervisor.start_child(Bids.Supervisor, {Bids.Worker, bid})
     {:ok, number_of_bids()}
