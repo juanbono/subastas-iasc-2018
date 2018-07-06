@@ -1,5 +1,4 @@
 defmodule Exchange.Buyers do
-  use Exchange.Validator, :buyers
   alias Exchange.Buyers
   alias Exchange.Buyers.Buyer
 

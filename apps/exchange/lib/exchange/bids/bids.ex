@@ -1,5 +1,4 @@
 defmodule Exchange.Bids do
-  use Exchange.Validator, :bids
   alias Exchange.Bids
   alias Exchange.Bids.Bid
 
@@ -8,12 +7,12 @@ defmodule Exchange.Bids do
     |> register()
   end
 
-  def process(:offer, payload) do
-    case valid?(payload["id"], payload) do
-      {:ok, offer} -> Exchange.create_bid(offer)
-      {:error, _} -> {:error, :invalid_json}
-    end
-  end
+  # def process(:offer, payload) do
+  #   case valid?(payload) do
+  #     {:ok, offer} -> Exchange.create_bid(offer)
+  #     {:error, _} -> {:error, :invalid_json}
+  #   end
+  # end
 
   @doc """
   Registra una apuesta en el sistema.
