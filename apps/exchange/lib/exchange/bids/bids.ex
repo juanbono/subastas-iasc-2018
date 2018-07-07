@@ -1,6 +1,6 @@
 defmodule Exchange.Bids do
   alias Exchange.Bids
-  alias Exchange.Bids.Bid
+  alias Exchange.Bids.{Bid, Offer}
 
   def process(:bid, params) do
     Bid.make(params)
@@ -26,7 +26,7 @@ defmodule Exchange.Bids do
   """
   def register({:error, _} = error), do: error
 
-  def register(bid) do
+  def register(%Bid{} = bid) do
     DynamicSupervisor.start_child(Bids.Supervisor, {Bids.Worker, bid})
     {:ok, number_of_bids()}
   end
@@ -41,6 +41,14 @@ defmodule Exchange.Bids do
   end
 
   def exists?(bid_id) do
-    # check if the given bid exists
+    bids =
+      Bids.current_bids()
+      |> Enum.map(fn bid_pid -> Bids.Worker.bid_id(bid_pid) end)
+
+    if Enum.member?(bids, bid_id) do
+      :invalid_bid_id
+    else
+      :ok
+    end
   end
 end

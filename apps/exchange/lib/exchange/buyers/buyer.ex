@@ -40,7 +40,7 @@ defmodule Exchange.Buyers.Buyer do
 
   defp check_name(buyer, params) do
     with {:ok, name} when is_binary(name) <- Map.fetch(params, "name"),
-         :ok <- check_name_availability(name) do
+         :ok <- Buyers.exists?(name) do
       Map.put(buyer, :name, name)
     else
       :invalid_name ->
@@ -61,18 +61,6 @@ defmodule Exchange.Buyers.Buyer do
 
       _error ->
         {:error, :invalid_tags}
-    end
-  end
-
-  defp check_name_availability(name) do
-    buyers =
-      Buyers.current_buyers()
-      |> Enum.map(fn buyer -> Buyers.Worker.name(buyer) end)
-
-    if Enum.member?(buyers, name) do
-      :invalid_name
-    else
-      :ok
     end
   end
 end

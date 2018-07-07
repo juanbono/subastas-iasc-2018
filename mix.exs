@@ -21,6 +21,7 @@ defmodule Subastas.MixProject do
       {:poison, "~> 3.1"},
       {:httpoison, "~> 1.2.0"},
       {:amnesia, "~> 0.2.7"},
+      {:elixir_uuid, "~> 1.2"},
       {:unsplit, git: "https://github.com/discordapp/unsplit"}
     ]
   end

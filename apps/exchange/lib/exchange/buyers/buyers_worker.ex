@@ -1,5 +1,6 @@
 defmodule Exchange.Buyers.Worker do
   use GenServer
+  alias Exchange.Buyers.Buyer
 
   ########################
   ## Funciones Servidor ##
@@ -8,7 +9,7 @@ defmodule Exchange.Buyers.Worker do
   @doc """
   Inicializa el Worker con los datos del `comprador` como estado.
   """
-  def init(buyer) do
+  def init(%Buyer{} = buyer) do
     {:ok, buyer}
   end
 
@@ -35,15 +36,17 @@ defmodule Exchange.Buyers.Worker do
   #######################
 
   @doc """
-  Notifica al comprador con el `pid` dado sobre una `apuesta`.
-  Para ello envia los datos de la apuesta al endpoint `/notify`
-  del comprador.
+  Devuelve el nombre del `comprador`.
   """
-
   def name(buyer_pid) do
     GenServer.call(buyer_pid, {:get_name})
   end
 
+  @doc """
+  Notifica al comprador con el `pid` dado sobre una `apuesta`.
+  Para ello envia los datos de la apuesta al endpoint `/notify`
+  del `comprador`.
+  """
   def notify(pid, bid) do
     GenServer.cast(pid, {:new_bid, bid})
   end
