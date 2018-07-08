@@ -41,7 +41,7 @@ defmodule Exchange.Router do
         send_json_resp(conn, :created, "Bid added succesfully! Bids: #{count}")
 
       {:error, :invalid_duration} ->
-        send_json_resp(conn, :unprocessable_entity, "Invalid duration")
+        send_json_resp(conn, :bad_request, "Invalid duration")
 
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_json} ->
@@ -61,11 +61,11 @@ defmodule Exchange.Router do
         send_json_resp(conn, :created, "Buyer added succesfully! Buyers: #{count}")
 
       {:error, :invalid_name} ->
-        send_json_resp(conn, :unprocessable_entity, "The name is already in use")
+        send_json_resp(conn, :bad_request, "The name is already in use")
 
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_ip} ->
-        send_json_resp(conn, :internal_server_error, "Invalid IP")
+        send_json_resp(conn, :bad_request, "Invalid IP")
 
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_tags} ->
