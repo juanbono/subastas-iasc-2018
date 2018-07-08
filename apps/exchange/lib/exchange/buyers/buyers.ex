@@ -1,8 +1,9 @@
 defmodule Exchange.Buyers do
-  alias Exchange.Buyers
-  alias Exchange.Buyers.Buyer
-  alias Exchange.Bids.Bid
+  alias Exchange.{Buyers, Buyers.Buyer, Bids.Bid}
 
+  @doc """
+  Valida los datos dados y registra a un nuevo `comprador` con ellos.
+  """
   def process(params) do
     Buyer.make(params)
     |> register()
@@ -34,10 +35,16 @@ defmodule Exchange.Buyers do
     |> Enum.each(fn pid -> Buyers.Worker.notify(pid, bid) end)
   end
 
+  @doc """
+  Cantidad de compradores en el sistema.
+  """
   def number_of_buyers() do
     DynamicSupervisor.count_children(Buyers.Supervisor).workers
   end
 
+  @doc """
+  Comprueba la existencia en el sistema de un `comprador` con nombre `name`.
+  """
   def exists?(name) do
     buyers =
       Buyers.current_buyers()

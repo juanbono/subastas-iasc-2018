@@ -17,7 +17,7 @@ defmodule Exchange.Bids do
   def apply({:error, _} = error), do: error
 
   def apply(%Offer{} = offer) do
-    # procesar el cambio
+    Bids.Worker.update(offer)
   end
 
   @doc """
@@ -43,6 +43,11 @@ defmodule Exchange.Bids do
     current_bids()
     |> Enum.find({:error, :bid_not_found}, fn pid -> Bids.Worker.bid_id(pid) == bid_id end)
     |> (fn pid -> Bids.Worker.get_state(pid) end).()
+  end
+
+  def get_bid_pid(bid_id) do
+    current_bids()
+    |> Enum.find({:error, :bid_not_found}, fn pid -> Bids.Worker.bid_id(pid) == bid_id end)
   end
 
   def exists?(bid_id) do
