@@ -1,4 +1,8 @@
 defmodule Exchange.Bids.Worker do
+  @moduledoc """
+  Cada `Exchange.Bids.Worker` mantiene el estado de una `apuesta` especifica.
+  Debe destruirse luego de pasado el tiempo especificado en la `apuesta`.
+  """
   use GenServer
   alias Exchange.{Bids, Bids.Bid, Bids.Offer}
 
@@ -6,11 +10,20 @@ defmodule Exchange.Bids.Worker do
   ## Funciones Cliente ##
   #######################
 
+  @doc """
+  Obtiene el `id` de la `apuesta`.
+  """
   def bid_id(bid_pid), do: GenServer.call(bid_pid, {:get_bid_id})
 
+  @doc """
+  Obtiene los datos de la `apuesta`.
+  """
   def get_state({:error, _} = error), do: error
   def get_state(bid_pid), do: GenServer.call(bid_pid, {:get_state})
 
+  @doc """
+  Actualiza los datos de la `apuesta` con la `oferta` dada.
+  """
   def update(%Offer{} = offer) do
     bid_pid = Bids.get_bid_pid(offer.bid_id)
     GenServer.call(bid_pid, {:update, offer})

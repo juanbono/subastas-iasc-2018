@@ -12,7 +12,7 @@ defmodule Exchange.Bids do
   end
 
   @doc """
-  Aplica una `oferta`.
+  Aplica una `oferta`. En caso de que el argumento pasado sea un error, lo devuelve.
   """
   def apply({:error, _} = error), do: error
 
@@ -30,26 +30,41 @@ defmodule Exchange.Bids do
     {:ok, number_of_bids()}
   end
 
+  @doc """
+  Devuelve una lista con los PIDs de las `apuestas` en el sistema.
+  """
   def current_bids() do
     DynamicSupervisor.which_children(Bids.Supervisor)
     |> Enum.map(fn {_, pid, _, _} -> pid end)
   end
 
+  @doc """
+  Cantidad de `apuestas` en el sistema.
+  """
   def number_of_bids() do
     DynamicSupervisor.count_children(Bids.Supervisor).workers
   end
 
+  @doc """
+  Devuelve los datos de la `apuesta` con el `id` dado.
+  """
   def get_bid(bid_id) do
     current_bids()
     |> Enum.find({:error, :bid_not_found}, fn pid -> Bids.Worker.bid_id(pid) == bid_id end)
     |> (fn pid -> Bids.Worker.get_state(pid) end).()
   end
 
+  @doc """
+  Devuelve el PID de la `apuesta` el `id` dado.
+  """
   def get_bid_pid(bid_id) do
     current_bids()
     |> Enum.find({:error, :bid_not_found}, fn pid -> Bids.Worker.bid_id(pid) == bid_id end)
   end
 
+  @doc """
+  Comprueba la existencia en el sistema de una `apuesta` con el `id` dado.
+  """
   def exists?(bid_id) do
     bids =
       Bids.current_bids()

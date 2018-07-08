@@ -10,7 +10,7 @@ defmodule Exchange.Buyers do
   end
 
   @doc """
-  Registra un comprador en el sistema.
+  Registra un comprador en el sistema. En caso de recibir un error, lo devuelve.
   """
   def register({:error, _} = error), do: error
 
@@ -28,9 +28,20 @@ defmodule Exchange.Buyers do
   end
 
   @doc """
-  Notifica a cada `comprador` la creación de una nueva `apuesta`.
+  Notifica a cada uno de los `compradores` en el sistema la creacion,
+  actualización o finalización de una `apuesta`.
   """
-  def notify_buyers(%Bid{} = bid) do
+  def notify_buyers(:new, %Bid{} = bid) do
+    current_buyers()
+    |> Enum.each(fn pid -> Buyers.Worker.notify(pid, bid) end)
+  end
+
+  def notify_buyers(:update, %Bid{} = bid) do
+    current_buyers()
+    |> Enum.each(fn pid -> Buyers.Worker.notify(pid, bid) end)
+  end
+
+  def notify_buyers(:termination, %Bid{} = bid) do
     current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify(pid, bid) end)
   end

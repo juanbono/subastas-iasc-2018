@@ -1,6 +1,6 @@
 defmodule Exchange.Router do
   use Plug.Router
-  alias Exchange.{Buyers, Bids}
+  alias Exchange
 
   plug(Plug.Logger)
   plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
@@ -8,23 +8,18 @@ defmodule Exchange.Router do
   plug(:dispatch)
 
   post "/buyers" do
-    Buyers.process(conn.body_params)
+    Exchange.create_buyer(conn.body_params)
     |> handle_response(:buyers_endpoint, conn)
   end
 
   post "/bids" do
-    Bids.process(:bid, conn.body_params)
+    Exchange.create_bid(conn.body_params)
     |> handle_response(:bids_endpoint, conn)
   end
 
   post "/bids/:id/offer" do
-    case Bids.process(:offer, conn.body_params) do
-      {:ok, new_price} ->
-        send_json_resp(conn, :ok, "New price accepted. Price: #{new_price}")
-
-      {:error, _reason} ->
-        send_json_resp(conn, :bad_request, "Invalid bid")
-    end
+    Exchange.update_bid(conn.body_params)
+    |> handle_response(:new_offer_endpoint, conn)
   end
 
   match _ do
@@ -73,6 +68,16 @@ defmodule Exchange.Router do
 
       {:error, reason} ->
         send_json_resp(conn, :bad_request, reason)
+    end
+  end
+
+  defp handle_response(result, :new_offer_endpoint, conn) do
+    case result do
+      {:ok, new_price} ->
+        send_json_resp(conn, :ok, "New price accepted. Price: #{new_price}")
+
+      {:error, _reason} ->
+        send_json_resp(conn, :bad_request, "Invalid bid")
     end
   end
 
