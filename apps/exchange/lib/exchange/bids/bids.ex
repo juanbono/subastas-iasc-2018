@@ -1,6 +1,5 @@
 defmodule Exchange.Bids do
-  alias Exchange.Bids
-  alias Exchange.Bids.{Bid, Offer}
+  alias Exchange.{Bids, Bids.Bid, Bids.Offer}
 
   def process(:bid, params) do
     Bid.make(params)
@@ -17,7 +16,7 @@ defmodule Exchange.Bids do
   """
   def apply({:error, _} = error), do: error
 
-  def apply(offer) do
+  def apply(%Offer{} = offer) do
     # procesar el cambio
   end
 
@@ -38,6 +37,12 @@ defmodule Exchange.Bids do
 
   def number_of_bids() do
     DynamicSupervisor.count_children(Bids.Supervisor).workers
+  end
+
+  def get_bid(bid_id) do
+    current_bids()
+    |> Enum.find({:error, :bid_not_found}, fn pid -> Bids.Worker.bid_id(pid) == bid_id end)
+    |> (fn pid -> Bids.Worker.get_state(pid) end).()
   end
 
   def exists?(bid_id) do

@@ -2,6 +2,15 @@ defmodule Exchange.Bids.Worker do
   use GenServer
   alias Exchange.Bids.Bid
 
+  #######################
+  ## Funciones Cliente ##
+  #######################
+
+  def bid_id(bid_pid), do: GenServer.call(bid_pid, {:get_bid_id})
+
+  def get_state({:error, _} = error), do: error
+  def get_state(bid_pid), do: GenServer.call(bid_pid, {:get_state})
+
   ########################
   ## Funciones Servidor ##
   ########################
@@ -21,11 +30,7 @@ defmodule Exchange.Bids.Worker do
     {:reply, bid_id, state}
   end
 
-  #######################
-  ## Funciones Cliente ##
-  #######################
-
-  def bid_id(bid_pid) do
-    GenServer.call(bid_pid, {:get_bid_id})
+  def handle_call({:get_state}, _from, state) do
+    {:reply, {:ok, state}, state}
   end
 end

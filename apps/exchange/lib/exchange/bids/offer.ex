@@ -2,7 +2,7 @@ defmodule Exchange.Bids.Offer do
   @moduledoc """
 
   """
-  alias Exchange.{Buyers, Bids}
+  alias Exchange.{Buyers, Bids, Bids.Bid}
 
   @enforce_keys [:bid_id, :price, :buyer]
   defstruct bid_id: nil, price: 0, buyer: ""
@@ -30,18 +30,19 @@ defmodule Exchange.Bids.Offer do
         {:error, :invalid_id}
 
       error ->
-        error
+        {:error, error}
     end
   end
 
   defp check_price({:error, _} = error, _params), do: error
 
-  # asumir que aca ya tengo el precio real de la oferta
-  # para poder comparar si es menor o mayor que el actual.
   defp check_price(offer, params) do
-    case Map.fetch(params, "price") do
-      {:ok, price} when price >= 0 ->
-        Map.put(offer, :price, price)
+    with {:ok, %Bid{price: current_price}} <- Bids.get_bid(params["bid_id"]),
+         {:ok, price} when price > current_price <- Map.fetch(params, "price") do
+      Map.put(offer, :price, price)
+    else
+      {:error, :bid_not_found} = not_found_err ->
+        not_found_err
 
       _error ->
         {:error, :invalid_price}
