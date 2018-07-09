@@ -1,5 +1,5 @@
 defmodule Exchange.Bids do
-  alias Exchange.{Bids, Bids.Bid, Bids.Offer}
+  alias Exchange.{Bids, Bids.Bid, Bids.Offer, Buyers}
 
   def process(:bid, params) do
     Bid.make(params)
@@ -17,7 +17,10 @@ defmodule Exchange.Bids do
   def apply({:error, _} = error), do: error
 
   def apply(%Offer{} = offer) do
-    Bids.Worker.update(offer)
+    updated_bid = Bids.Worker.update(offer)
+    Buyers.notify_buyers(:new, updated_bid)
+
+    {:ok, updated_bid.price}
   end
 
   @doc """
@@ -27,6 +30,7 @@ defmodule Exchange.Bids do
 
   def register(%Bid{} = bid) do
     DynamicSupervisor.start_child(Bids.Supervisor, {Bids.Worker, bid})
+    Buyers.notify_buyers(:new, bid)
     {:ok, number_of_bids()}
   end
 
@@ -71,9 +75,9 @@ defmodule Exchange.Bids do
       |> Enum.map(fn bid_pid -> Bids.Worker.bid_id(bid_pid) end)
 
     if Enum.member?(bids, bid_id) do
-      :invalid_bid_id
-    else
       :ok
+    else
+      :invalid_bid_id
     end
   end
 end

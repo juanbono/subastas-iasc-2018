@@ -69,9 +69,9 @@ defmodule Exchange.Buyers do
       |> Enum.map(fn buyer -> Buyers.Worker.name(buyer) end)
 
     if Enum.member?(buyers, name) do
-      :invalid_name
-    else
       :ok
+    else
+      :invalid_name
     end
   end
 end

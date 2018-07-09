@@ -61,9 +61,9 @@ defmodule Exchange.Buyers.Worker do
   end
 
   def handle_cast({:bid_created, bid}, %Buyer{ip: ip, tags: tags} = state) do
-    if has_tags_in_common?(bid["tags"], tags) do
+    if has_tags_in_common?(bid.tags, tags) do
       json_bid = make_body(:new, bid)
-      url = ip <> "/notify?type=new"
+      url = ip <> "/bids/open"
 
       res = HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}])
 
@@ -75,7 +75,7 @@ defmodule Exchange.Buyers.Worker do
 
   def handle_cast({:bid_updated, bid}, %Buyer{name: name, ip: ip} = state) do
     json_bid = make_body(:update, bid)
-    url = ip <> "/notify?type=update"
+    url = ip <> "/bids/new_offer"
 
     res = HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}])
 
@@ -86,7 +86,7 @@ defmodule Exchange.Buyers.Worker do
 
   def handle_cast({:bid_terminated, bid}, %Buyer{name: name, ip: ip} = state) do
     json_bid = make_body(:termination, bid)
-    url = ip <> "/notify?type=terminated"
+    url = ip <> "/bids/close"
 
     res = HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}])
 

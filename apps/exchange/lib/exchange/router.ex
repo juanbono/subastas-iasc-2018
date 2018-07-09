@@ -17,7 +17,7 @@ defmodule Exchange.Router do
     |> handle_response(:bids_endpoint, conn)
   end
 
-  post "/bids/:id/offer" do
+  post "/bids/offer" do
     Exchange.update_bid(conn.body_params)
     |> handle_response(:new_offer_endpoint, conn)
   end
@@ -76,8 +76,8 @@ defmodule Exchange.Router do
       {:ok, new_price} ->
         send_json_resp(conn, :ok, "New price accepted. Price: #{new_price}")
 
-      {:error, _reason} ->
-        send_json_resp(conn, :bad_request, "Invalid bid")
+      {:error, reason} ->
+        send_json_resp(conn, :bad_request, "Invalid bid: #{reason}")
     end
   end
 

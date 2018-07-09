@@ -7,29 +7,25 @@ defmodule Client.Router do
   plug(:dispatch)
 
   post "/bids/open" do
-    Task.async(
-      fn -> Client.OfferLogic.process(conn.body_params) end
-    )
+    Task.async(fn -> Client.OfferLogic.process(conn.body_params) end)
 
     conn
-      |> put_resp_content_type("application/json")
-      |> send_resp(200, Poison.encode!(%{message: "Ok"}))
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Poison.encode!(%{message: "Ok"}))
   end
 
   post "/bids/new_offer" do
-    Task.async(
-      fn -> Client.OfferLogic.process(conn.body_params) end
-    )
+    Task.async(fn -> Client.OfferLogic.process(conn.body_params) end)
 
     conn
-      |> put_resp_content_type("application/json")
-      |> send_resp(200, Poison.encode!(%{message: "Ok"}))
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Poison.encode!(%{message: "Ok, new bid received!\n"}))
   end
 
   post "/bids/close" do
     conn
-      |> put_resp_content_type("application/json")
-      |> send_resp(200, Poison.encode!(%{message: "Ok"}))
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Poison.encode!(%{message: "Ok, bid finalization received!\n"}))
   end
 
   match _ do
