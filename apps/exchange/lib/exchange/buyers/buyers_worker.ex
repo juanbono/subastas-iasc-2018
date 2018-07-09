@@ -114,7 +114,7 @@ defmodule Exchange.Buyers.Worker do
         json: bid.json,
         price: bid.price,
         tags: bid.tags,
-        duration: bid.duration
+        close_at: DateTime.from_unix!(bid.close_at)
       })
 
   defp make_body(:update, %Bid{} = bid),
@@ -123,7 +123,7 @@ defmodule Exchange.Buyers.Worker do
         id: bid.bid_id,
         price: bid.price,
         winner: bid.winner,
-        duration: bid.duration
+        close_at: DateTime.from_unix!(bid.close_at)
       })
 
   defp make_body(:termination, %Bid{} = bid),
@@ -132,7 +132,7 @@ defmodule Exchange.Buyers.Worker do
         id: bid.bid_id,
         price: bid.price,
         winner: bid.winner,
-        duration: bid.duration
+        close_at: DateTime.from_unix!(bid.close_at)
       })
 
   defp has_tags_in_common?(bid_tags, buyer_tags) do

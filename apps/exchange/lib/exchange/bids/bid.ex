@@ -3,10 +3,10 @@ defmodule Exchange.Bids.Bid do
 
   """
 
-  @enforce_keys [:price, :duration, :json, :tags, :bid_id, :interested_buyers]
+  @enforce_keys [:price, :close_at, :json, :tags, :bid_id, :interested_buyers]
   defstruct bid_id: nil,
             price: nil,
-            duration: nil,
+            close_at: nil,
             json: nil,
             tags: nil,
             interested_buyers: nil,
@@ -20,7 +20,7 @@ defmodule Exchange.Bids.Bid do
   def make(params) do
     empty()
     |> check_price(params)
-    |> check_duration(params)
+    |> check_close_at(params)
     |> check_json(params)
     |> check_tags(params)
   end
@@ -32,7 +32,7 @@ defmodule Exchange.Bids.Bid do
     do: %__MODULE__{
       bid_id: nil,
       price: nil,
-      duration: nil,
+      close_at: nil,
       json: nil,
       tags: nil,
       interested_buyers: nil
@@ -50,15 +50,17 @@ defmodule Exchange.Bids.Bid do
     end
   end
 
-  defp check_duration({:error, _reason} = err, _params), do: err
+  defp check_close_at({:error, _reason} = err, _params), do: err
 
-  defp check_duration(bid, params) do
-    case Map.fetch(params, "duration") do
-      {:ok, duration} when duration > 0 ->
-        Map.put(bid, :duration, duration)
+  defp check_close_at(bid, params) do
+    now_to_unix = DateTime.to_unix(DateTime.utc_now()) + 5
 
-      _error ->
-        {:error, :invalid_duration}
+    with {:ok, close_at} when close_at > now_to_unix <- Map.fetch(params, "close_at"),
+         {:ok, close_at_date} <- DateTime.from_unix(close_at) do
+      Map.put(bid, :close_at, close_at_date)
+    else
+      _err ->
+        {:error, :invalid_close_at}
     end
   end
 
