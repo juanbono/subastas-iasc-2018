@@ -8,9 +8,9 @@ defmodule Exchange.Buyers.Buyer do
   defstruct ip: "", name: "", tags: []
 
   @doc """
-  Smart constructor para las apuestas.
+  Smart constructor para los compradores.
   Maneja toda la lógica de validación
-  para construir una apuesta válida.
+  para construir un comprador válido.
   """
   def make(params) do
     empty()
