@@ -45,9 +45,7 @@ defmodule Exchange.Bids do
   @doc """
   Cantidad de `apuestas` en el sistema.
   """
-  def number_of_bids() do
-    DynamicSupervisor.count_children(Bids.Supervisor).workers
-  end
+  def number_of_bids(), do: DynamicSupervisor.count_children(Bids.Supervisor).workers
 
   @doc """
   Devuelve los datos de la `apuesta` con el `id` dado.
@@ -74,10 +72,6 @@ defmodule Exchange.Bids do
       Bids.current_bids()
       |> Enum.map(fn bid_pid -> Bids.Worker.bid_id(bid_pid) end)
 
-    if Enum.member?(bids, bid_id) do
-      :ok
-    else
-      :invalid_bid_id
-    end
+    if Enum.member?(bids, bid_id), do: :ok, else: :invalid_bid_id
   end
 end
