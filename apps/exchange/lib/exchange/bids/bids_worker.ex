@@ -71,7 +71,7 @@ defmodule Exchange.Bids.Worker do
     new_state = %Bid{
       bid_id: state.bid_id,
       price: offer.price,
-      duration: state.duration,
+      close_at: state.close_at,
       json: state.json,
       tags: state.tags,
       interested_buyers: MapSet.put(state.interested_buyers, offer.buyer),
@@ -87,6 +87,7 @@ defmodule Exchange.Bids.Worker do
   end
 
   def schedule_timeout(bid) do
-    Process.send_after(self(), :timeout, bid.duration)
+    duration = DateTime.diff(bid.close_at, DateTime.utc_now) * 1000
+    Process.send_after(self(), :timeout, duration)
   end
 end

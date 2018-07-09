@@ -15,7 +15,7 @@
 ```json
 {
   "price": 2700,
-  "duration": 400,
+  "close_at": 1533764803,
   "json": {"name": "a table", "country": "Argentina"},
   "tags": ["wood"]
 }
@@ -32,7 +32,7 @@
     "image_url": "https://tascani.vteximg.com.br/arquivos/ids/161468-340-510/jean-slim-tiana-2.jpg"
   },
   "best_offer": null,
-  "close_for": 1529856667,
+  "close_at": 1529856667,
   "tags": ["fashion", "jeans", "free_shipment"],
   "seller": {
     "id": 1,
@@ -56,7 +56,7 @@
     "price": 3000,
     "user_id": 40
   },
-  "close_for": 1529856667,
+  "close_at": 1529856667,
   "tags": ["fashion", "jeans", "free_shipment"],
   "seller": {
     "id": 1,
@@ -80,7 +80,7 @@
     "price": 3000,
     "user_id": 40
   },
-  "close_for": 1529856667,
+  "close_at": 1529856667,
   "tags": ["fashion", "jeans", "free_shipment"],
   "seller": {
     "id": 1,

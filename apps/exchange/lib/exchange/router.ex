@@ -35,8 +35,8 @@ defmodule Exchange.Router do
       {:ok, count} ->
         send_json_resp(conn, :created, "Bid added succesfully! Bids: #{count}")
 
-      {:error, :invalid_duration} ->
-        send_json_resp(conn, :bad_request, "Invalid duration")
+      {:error, :invalid_close_at} ->
+        send_json_resp(conn, :bad_request, "Invalid close at")
 
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_json} ->
