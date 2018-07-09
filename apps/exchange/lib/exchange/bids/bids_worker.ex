@@ -4,7 +4,7 @@ defmodule Exchange.Bids.Worker do
   Debe destruirse luego de pasado el tiempo especificado en la `apuesta`.
   """
   use GenServer
-  alias Exchange.{Bids, Bids.Bid, Bids.Offer}
+  alias Exchange.{Bids, Bids.Bid, Bids.Offer, Buyers}
 
   #######################
   ## Funciones Cliente ##
@@ -29,6 +29,14 @@ defmodule Exchange.Bids.Worker do
     GenServer.call(bid_pid, {:update, offer})
   end
 
+  def child_spec(opts) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, [opts]},
+      restart: :transient
+    }
+  end
+
   ########################
   ## Funciones Servidor ##
   ########################
@@ -41,6 +49,8 @@ defmodule Exchange.Bids.Worker do
       bid
       |> Map.put(:bid_id, UUID.uuid1())
       |> Map.put(:interested_buyers, MapSet.new())
+
+    schedule_timeout(bid)
 
     {:ok, new_bid}
   end
@@ -69,5 +79,14 @@ defmodule Exchange.Bids.Worker do
     }
 
     {:reply, new_state, new_state}
+  end
+
+  def handle_info(:timeout, state) do
+    Buyers.notify_buyers(:termination, state)
+    Process.exit(self(), :normal)
+  end
+
+  def schedule_timeout(bid) do
+    Process.send_after(self(), :timeout, bid.duration)
   end
 end

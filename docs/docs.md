@@ -53,7 +53,7 @@
     "image_url": "https://tascani.vteximg.com.br/arquivos/ids/161468-340-510/jean-slim-tiana-2.jpg"
   },
   "best_offer": {
-    "price": 2500,
+    "price": 3000,
     "user_id": 40
   },
   "close_for": 1529856667,
@@ -77,7 +77,7 @@
     "image_url": "https://tascani.vteximg.com.br/arquivos/ids/161468-340-510/jean-slim-tiana-2.jpg"
   },
   "best_offer": {
-    "price": 2500,
+    "price": 3000,
     "user_id": 40
   },
   "close_for": 1529856667,
