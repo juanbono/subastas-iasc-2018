@@ -2,6 +2,7 @@ defmodule Exchange.Buyers.Buyer do
   @moduledoc """
 
   """
+  alias Exchange.Buyers
 
   @enforce_keys [:ip, :name, :tags]
   defstruct ip: "", name: "", tags: []
@@ -39,15 +40,15 @@ defmodule Exchange.Buyers.Buyer do
 
   defp check_name(buyer, params) do
     with {:ok, name} when is_binary(name) <- Map.fetch(params, "name"),
-         :ok <- check_name_availability(name) do
+         :ok <- Buyers.exists?(name) do
       Map.put(buyer, :name, name)
     else
       :invalid_name ->
         {:error, :invalid_name}
 
       # podemos manejar aca el caso en el que el server no tiene espacio?
-      error ->
-        error
+      _error ->
+        {:error, "Name is not present"}
     end
   end
 
@@ -60,18 +61,6 @@ defmodule Exchange.Buyers.Buyer do
 
       _error ->
         {:error, :invalid_tags}
-    end
-  end
-
-  defp check_name_availability(name) do
-    buyers =
-      Exchange.Buyers.current_buyers()
-      |> Enum.map(fn buyer -> Exchange.Buyers.Worker.name(buyer) end)
-
-    if Enum.member?(buyers, name) do
-      :invalid_name
-    else
-      :ok
     end
   end
 end

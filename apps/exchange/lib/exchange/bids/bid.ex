@@ -3,8 +3,14 @@ defmodule Exchange.Bids.Bid do
 
   """
 
-  @enforce_keys [:price, :duration, :json, :tags]
-  defstruct price: 0, duration: 0, json: %{}, tags: []
+  @enforce_keys [:price, :duration, :json, :tags, :bid_id, :interested_buyers]
+  defstruct bid_id: nil,
+            price: nil,
+            duration: nil,
+            json: nil,
+            tags: nil,
+            interested_buyers: nil,
+            winner: nil
 
   @doc """
   Smart constructor para las apuestas.
@@ -22,7 +28,15 @@ defmodule Exchange.Bids.Bid do
   @doc """
   Devuelve una `apuesta` vacia.
   """
-  def empty(), do: %__MODULE__{price: nil, duration: nil, json: nil, tags: nil}
+  def empty(),
+    do: %__MODULE__{
+      bid_id: nil,
+      price: nil,
+      duration: nil,
+      json: nil,
+      tags: nil,
+      interested_buyers: nil
+    }
 
   defp check_price({:error, _reason} = err, _params), do: err
 

@@ -1,5 +1,49 @@
 defmodule Exchange.Buyers.Worker do
   use GenServer
+  alias Exchange.{Buyers.Buyer, Bids.Bid}
+
+  #######################
+  ## Funciones Cliente ##
+  #######################
+
+  @doc """
+  Devuelve el nombre del `comprador` con el `pid` dado.
+  """
+  def name(buyer_pid) do
+    GenServer.call(buyer_pid, {:get_name})
+  end
+
+  @doc """
+  Notifica al comprador con el `pid` dado sobre la creacion de
+  una `apuesta`.
+  """
+  def notify_new(pid, %Bid{} = bid) do
+    GenServer.cast(pid, {:bid_created, bid})
+  end
+
+  @doc """
+  Notifica al comprador con el `pid` dado sobre
+  la actualización de una `apuesta`.
+  """
+  def notify_update(pid, %Bid{} = bid) do
+    GenServer.cast(pid, {:bid_updated, bid})
+  end
+
+  @doc """
+  Notifica al comprador con el `pid` dado sobre
+  la finalización de una `apuesta`.
+  """
+  def notify_termination(pid, %Bid{} = bid) do
+    GenServer.cast(pid, {:bid_terminated, bid})
+  end
+
+  @doc """
+  Verifica si el nombre del `comprador` se encuentra dentro
+  de la lista de compradores dada.
+  """
+  def in?(pid, buyers_list) do
+    GenServer.call(pid, {:name_is_in, buyers_list})
+  end
 
   ########################
   ## Funciones Servidor ##
@@ -8,7 +52,7 @@ defmodule Exchange.Buyers.Worker do
   @doc """
   Inicializa el Worker con los datos del `comprador` como estado.
   """
-  def init(buyer) do
+  def init(%Buyer{} = buyer) do
     {:ok, buyer}
   end
 
@@ -16,37 +60,80 @@ defmodule Exchange.Buyers.Worker do
     GenServer.start_link(__MODULE__, buyer_data, debug: [:statistics, :trace])
   end
 
-  def handle_cast({:new_bid, bid}, %{"ip" => ip} = state) do
-    if has_tags_in_common?(bid["tags"], state["tags"]) do
-      json_bid = Poison.encode!(bid)
-      res = HTTPoison.post!(ip <> "/notify", json_bid, [{"content-type", "application/json"}])
+  def handle_cast({:bid_created, bid}, %Buyer{ip: ip, tags: tags} = state) do
+    if has_tags_in_common?(bid.tags, tags) do
+      json_bid = make_body(:new, bid)
+      url = ip <> "/bids/open"
+
+      res = HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}])
+
       IO.inspect(res.body, label: "response body")
     end
 
     {:noreply, state}
   end
 
-  def handle_call({:get_name}, _from, %{name: name} = state) do
+  def handle_cast({:bid_updated, bid}, %Buyer{name: name, ip: ip} = state) do
+    json_bid = make_body(:update, bid)
+    url = ip <> "/bids/new_offer"
+
+    res = HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}])
+
+    IO.inspect(res.body, label: "#{name} response body")
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:bid_terminated, bid}, %Buyer{name: name, ip: ip} = state) do
+    json_bid = make_body(:termination, bid)
+    url = ip <> "/bids/close"
+
+    res = HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}])
+
+    IO.inspect(res.body, label: "#{name} response body")
+
+    {:noreply, state}
+  end
+
+  def handle_call({:get_name}, _from, %Buyer{name: name} = state) do
     {:reply, name, state}
   end
 
-  #######################
-  ## Funciones Cliente ##
-  #######################
-
-  @doc """
-  Notifica al comprador con el `pid` dado sobre una `apuesta`.
-  Para ello envia los datos de la apuesta al endpoint `/notify`
-  del comprador.
-  """
-
-  def name(buyer_pid) do
-    GenServer.call(buyer_pid, {:get_name})
+  def handle_call({:name_is_in, list}, _from, %Buyer{name: name} = state) do
+    {:reply, Enum.member?(list, name), state}
   end
 
-  def notify(pid, bid) do
-    GenServer.cast(pid, {:new_bid, bid})
-  end
+  ##########################
+  ## Funciones Auxiliares ##
+  ##########################
+
+  defp make_body(:new, %Bid{} = bid),
+    do:
+      Poison.encode!(%{
+        id: bid.bid_id,
+        json: bid.json,
+        price: bid.price,
+        tags: bid.tags,
+        duration: bid.duration
+      })
+
+  defp make_body(:update, %Bid{} = bid),
+    do:
+      Poison.encode!(%{
+        id: bid.bid_id,
+        price: bid.price,
+        winner: bid.winner,
+        duration: bid.duration
+      })
+
+  defp make_body(:termination, %Bid{} = bid),
+    do:
+      Poison.encode!(%{
+        id: bid.bid_id,
+        price: bid.price,
+        winner: bid.winner,
+        duration: bid.duration
+      })
 
   defp has_tags_in_common?(bid_tags, buyer_tags) do
     bid_tags

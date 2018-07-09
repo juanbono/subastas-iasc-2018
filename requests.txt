@@ -1,9 +1,14 @@
 # request para probar /buyers
 curl -H "Content-Type: application/json" \
-     -d '{"name":"name1", "ip":"127.0.0.1:5000", "tags":["cats"]}' \
+     -d '{"name":"A", "ip":"127.0.0.1:5000", "tags":["cats"]}' \
      http://localhost:4000/buyers
 
 # request para probar /bids
 curl -H "Content-Type: application/json" \
      -d '{"tags":["cats", "pets"], "price": 2.0, "duration": 5000, "json": {"id": 12, "name": "mimisho"}}' \
      http://localhost:4000/bids
+
+# request para probar actualizacion de bids
+curl -H "Content-Type: application/json" \
+     -d '{"buyer": "A", "price": 3.0, "bid_id": "d0a91a9e-8332-11e8-a88b-e8039a53f132"}' \
+     http://localhost:4000/bids/offer

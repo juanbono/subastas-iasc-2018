@@ -1,5 +1,6 @@
 defmodule Exchange.Router do
   use Plug.Router
+  alias Exchange
 
   plug(Plug.Logger)
   plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
@@ -7,23 +8,18 @@ defmodule Exchange.Router do
   plug(:dispatch)
 
   post "/buyers" do
-    Exchange.Buyers.process(conn.body_params)
+    Exchange.create_buyer(conn.body_params)
     |> handle_response(:buyers_endpoint, conn)
   end
 
   post "/bids" do
-    Exchange.Bids.process(:bid, conn.body_params)
+    Exchange.create_bid(conn.body_params)
     |> handle_response(:bids_endpoint, conn)
   end
 
-  post "/bids/:id/offer" do
-    case Exchange.Bids.process(:offer, conn.body_params) do
-      {:ok, new_price} ->
-        send_json_resp(conn, :ok, "New price accepted. Price: #{new_price}")
-
-      {:error, _reason} ->
-        send_json_resp(conn, :bad_request, "Invalid bid")
-    end
+  post "/bids/offer" do
+    Exchange.update_bid(conn.body_params)
+    |> handle_response(:new_offer_endpoint, conn)
   end
 
   match _ do
@@ -40,7 +36,7 @@ defmodule Exchange.Router do
         send_json_resp(conn, :created, "Bid added succesfully! Bids: #{count}")
 
       {:error, :invalid_duration} ->
-        send_json_resp(conn, :unprocessable_entity, "Invalid duration")
+        send_json_resp(conn, :bad_request, "Invalid duration")
 
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_json} ->
@@ -60,11 +56,11 @@ defmodule Exchange.Router do
         send_json_resp(conn, :created, "Buyer added succesfully! Buyers: #{count}")
 
       {:error, :invalid_name} ->
-        send_json_resp(conn, :unprocessable_entity, "The name is already in use")
+        send_json_resp(conn, :bad_request, "The name is already in use")
 
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_ip} ->
-        send_json_resp(conn, :internal_server_error, "Invalid IP")
+        send_json_resp(conn, :bad_request, "Invalid IP")
 
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_tags} ->
@@ -75,26 +71,15 @@ defmodule Exchange.Router do
     end
   end
 
-  def is_valid_offer?(id, conn) do
-    valid_id = has_valid_id(id)
+  defp handle_response(result, :new_offer_endpoint, conn) do
+    case result do
+      {:ok, new_price} ->
+        send_json_resp(conn, :ok, "New price accepted. Price: #{new_price}")
 
-    valid_conn =
-      [&has_name/1, &has_price/1]
-      |> is_valid?(conn)
-
-    valid_id && valid_conn
+      {:error, reason} ->
+        send_json_resp(conn, :bad_request, "Invalid bid: #{reason}")
+    end
   end
-
-  defp is_valid?(predicates, conn),
-    do: Enum.all?(predicates, fn pred -> pred.(conn) end)
-
-  defp has_valid_id(id), do: Exchange.Bids.exists?(id)
-  defp has_name(conn), do: Map.has_key?(conn.body_params, "name")
-  defp has_ip(conn), do: Map.has_key?(conn.body_params, "ip")
-  defp has_tags(conn), do: Map.has_key?(conn.body_params, "tags")
-  defp has_price(conn), do: Map.has_key?(conn.body_params, "price")
-  defp has_duration(conn), do: Map.has_key?(conn.body_params, "duration")
-  defp has_json(conn), do: Map.has_key?(conn.body_params, "json")
 
   # TODO: mandar a un modulo aparte
   def send_json_resp(conn, :ok, body) do
