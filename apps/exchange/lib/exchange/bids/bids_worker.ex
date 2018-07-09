@@ -37,7 +37,12 @@ defmodule Exchange.Bids.Worker do
   Inicializa el Worker con los datos de la `apuesta` como estado.
   """
   def init(%Bid{} = bid) do
-    {:ok, Map.put(bid, :bid_id, UUID.uuid1())}
+    new_bid =
+      bid
+      |> Map.put(:bid_id, UUID.uuid1())
+      |> Map.put(:interested_buyers, MapSet.new())
+
+    {:ok, new_bid}
   end
 
   def start_link(bid_data) do
@@ -58,7 +63,9 @@ defmodule Exchange.Bids.Worker do
       price: offer.price,
       duration: state.duration,
       json: state.json,
-      tags: state.json
+      tags: state.json,
+      interested_buyers: MapSet.put(state.interested_buyers, offer.buyer),
+      winner: offer.buyer
     }
 
     {:reply, new_state, new_state}

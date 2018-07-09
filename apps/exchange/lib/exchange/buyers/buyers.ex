@@ -33,17 +33,19 @@ defmodule Exchange.Buyers do
   """
   def notify_buyers(:new, %Bid{} = bid) do
     current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify(pid, bid) end)
+    |> Enum.each(fn pid -> Buyers.Worker.notify_new(pid, bid) end)
   end
 
   def notify_buyers(:update, %Bid{} = bid) do
-    current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify(pid, bid) end)
+    bid.interested_buyers
+    |> names_to_pids()
+    |> Enum.each(fn pid -> Buyers.Worker.notify_update(pid, bid) end)
   end
 
   def notify_buyers(:termination, %Bid{} = bid) do
-    current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify(pid, bid) end)
+    bid.interested_buyers
+    |> names_to_pids()
+    |> Enum.each(fn pid -> Buyers.Worker.notify_termination(pid, bid) end)
   end
 
   @doc """
@@ -51,6 +53,11 @@ defmodule Exchange.Buyers do
   """
   def number_of_buyers() do
     DynamicSupervisor.count_children(Buyers.Supervisor).workers
+  end
+
+  def names_to_pids(buyer_names) do
+    current_buyers()
+    |> Enum.filter(fn pid -> Buyers.Worker.in?(pid, buyer_names) end)
   end
 
   @doc """
