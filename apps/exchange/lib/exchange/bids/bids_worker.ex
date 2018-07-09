@@ -63,7 +63,7 @@ defmodule Exchange.Bids.Worker do
       price: offer.price,
       duration: state.duration,
       json: state.json,
-      tags: state.json,
+      tags: state.tags,
       interested_buyers: MapSet.put(state.interested_buyers, offer.buyer),
       winner: offer.buyer
     }
