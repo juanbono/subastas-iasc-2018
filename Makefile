@@ -28,7 +28,10 @@ start_exchange:
 	cd apps/exchange && iex -S mix
 
 start_clientA:
-	cd apps/client/ && PORT=5001 iex -S mix
+	cd apps/client/ && PORT=5001 iex --sname A -S mix
 
 start_clientB:
-	cd apps/client/ && PORT=5002 iex -S mix
+	cd apps/client/ && PORT=5002 iex --sname B -S mix
+
+start_clientC:
+	cd apps/client/ && PORT=5003 iex --sname C -S mix
