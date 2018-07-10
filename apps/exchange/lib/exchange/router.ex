@@ -22,6 +22,11 @@ defmodule Exchange.Router do
     |> handle_response(:new_offer_endpoint, conn)
   end
 
+  post "/bids/cancel" do
+    Exchange.cancel_bid(conn.body_params)
+    |> handle_response(:cancel_offer_endpoint, conn)
+  end
+
   match _ do
     send_json_resp(conn, :not_found, "Valid endpoints: '/buyers' and '/bids'")
   end
@@ -65,6 +70,16 @@ defmodule Exchange.Router do
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_tags} ->
         send_json_resp(conn, :bad_request, "Invalid tags")
+
+      {:error, reason} ->
+        send_json_resp(conn, :bad_request, reason)
+    end
+  end
+
+  defp handle_response(result, :cancel_offer_endpoint, conn) do
+    case result do
+      {:ok} ->
+        send_json_resp(conn, :created, "Bid cancelled succesfully!")
 
       {:error, reason} ->
         send_json_resp(conn, :bad_request, reason)

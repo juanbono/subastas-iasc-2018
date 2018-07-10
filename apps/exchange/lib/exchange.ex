@@ -23,6 +23,13 @@ defmodule Exchange do
   end
 
   @doc """
+  Cancel una `apuesta` con los datos pasados como parametro.
+  """
+  def cancel_bid(offer_data) do
+    Bids.process(:cancel, offer_data)
+  end
+
+  @doc """
   Notifica a cada uno de los `compradores`
   en el sistema la creacion de una `apuesta`.
   """

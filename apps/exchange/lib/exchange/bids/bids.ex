@@ -11,6 +11,19 @@ defmodule Exchange.Bids do
     |> apply()
   end
 
+  def process(:cancel, params) do
+    with {:ok, bid_id} <- Map.fetch(params, "bid_id"),
+         :ok <- Bids.exists?(bid_id) do
+      Bids.Worker.cancel(bid_id)
+    else
+      :invalid_id ->
+        {:error, :invalid_id}
+
+      error ->
+        {:error, error}
+    end
+  end
+
   @doc """
   Aplica una `oferta`. En caso de que el argumento pasado sea un error, lo devuelve.
   """
