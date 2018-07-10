@@ -24,7 +24,7 @@ defmodule Client.OfferLogic do
   def offer_params(body_params) do
     Poison.encode!(%{
       # change the buyer name
-      buyer: "A",
+      buyer: choose_client(),
       price: body_params["price"] + 10,
       bid_id: body_params["id"]
     })
@@ -34,5 +34,9 @@ defmodule Client.OfferLogic do
     IO.inspect(params, label: "voy a enviar estos parametros \n")
     res = HTTPoison.post!(url, params, [{"content-type", "application/json"}])
     IO.inspect(res, label: "recibido luego de ofertar")
+  end
+
+  def choose_client() do
+    Enum.random(["A", "B"])
   end
 end
