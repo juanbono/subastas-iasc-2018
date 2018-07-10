@@ -79,7 +79,7 @@ defmodule Exchange.Router do
   defp handle_response(result, :cancel_offer_endpoint, conn) do
     case result do
       {:ok} ->
-        send_json_resp(conn, :created, "Bid cancelled succesfully!")
+        send_json_resp(conn, :ok, "Bid cancelled succesfully!")
 
       {:error, reason} ->
         send_json_resp(conn, :bad_request, reason)
