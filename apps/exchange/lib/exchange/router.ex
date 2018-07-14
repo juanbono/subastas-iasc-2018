@@ -1,6 +1,6 @@
 defmodule Exchange.Router do
   use Plug.Router
-  alias Exchange
+  alias Exchange.{Bids.Bid}
 
   plug(Plug.Logger)
   plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
@@ -35,108 +35,110 @@ defmodule Exchange.Router do
   ## Helper Functions ##
   ######################
 
-  defp handle_response(result, :bids_endpoint, conn) do
-    case result do
-      {:ok, count} ->
-        send_json_resp(conn, :created, "Bid added succesfully! Bids: #{count}")
-
-      {:error, :invalid_close_at} ->
-        send_json_resp(conn, :bad_request, "Invalid close at")
-
-      # TODO: generalizar este caso en todos los endpoints
-      {:error, :invalid_json} ->
-        send_json_resp(conn, :bad_request, "Invalid request")
-
-      {:error, :invalid_tags} ->
-        send_json_resp(conn, :bad_request, "Invalid tags")
-
-      {:error, reason} ->
-        send_json_resp(conn, :bad_request, reason)
-    end
-  end
-
   defp handle_response(result, :buyers_endpoint, conn) do
     case result do
       {:ok, count} ->
-        send_json_resp(conn, :created, "Buyer added succesfully! Buyers: #{count}")
+        send_json_message(conn, :created, "Buyer added succesfully! Buyers: #{count}")
 
       {:error, :invalid_name} ->
-        send_json_resp(conn, :bad_request, "The name is already in use")
+        send_json_error(conn, :bad_request, "The name is already in use")
 
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_ip} ->
-        send_json_resp(conn, :bad_request, "Invalid IP")
+        send_json_error(conn, :bad_request, "Invalid IP")
 
       # TODO: generalizar este caso en todos los endpoints
       {:error, :invalid_tags} ->
-        send_json_resp(conn, :bad_request, "Invalid tags")
+        send_json_error(conn, :bad_request, "Invalid tags")
 
       {:error, reason} ->
-        send_json_resp(conn, :bad_request, reason)
+        send_json_error(conn, :bad_request, reason)
+    end
+  end
+
+  defp handle_response(result, :bids_endpoint, conn) do
+    case result do
+      {:ok, bid} ->
+        send_json_resp(conn, :created, Bid.to_map(bid))
+
+      {:error, :invalid_close_at} ->
+        send_json_error(conn, :bad_request, "Invalid close at")
+
+      # TODO: generalizar este caso en todos los endpoints
+      {:error, :invalid_json} ->
+        send_json_error(conn, :bad_request, "Invalid request")
+
+      {:error, :invalid_tags} ->
+        send_json_error(conn, :bad_request, "Invalid tags")
+
+      {:error, reason} ->
+        send_json_error(conn, :bad_request, reason)
     end
   end
 
   defp handle_response(result, :cancel_offer_endpoint, conn) do
     case result do
       {:ok} ->
-        send_json_resp(conn, :ok, "Bid cancelled succesfully!")
+        send_json_message(conn, :ok, "Bid cancelled succesfully!")
 
       {:error, reason} ->
-        send_json_resp(conn, :bad_request, reason)
+        send_json_error(conn, :bad_request, reason)
     end
   end
 
   defp handle_response(result, :new_offer_endpoint, conn) do
     case result do
-      {:ok, new_price} ->
-        send_json_resp(conn, :ok, "New price accepted. Price: #{new_price}")
+      {:ok, bid} ->
+        send_json_resp(conn, :created, Bid.to_map(bid))
 
       {:error, reason} ->
-        send_json_resp(conn, :bad_request, "Invalid bid: #{reason}")
+        send_json_error(conn, :bad_request, "Invalid bid: #{reason}")
     end
   end
 
   # TODO: mandar a un modulo aparte
-  def send_json_resp(conn, :ok, body) do
+  def send_json_message(conn, status, message) do
     conn
-    |> send_json_resp_by(200, %{
-      message: body
+    |> send_json_resp_by(status, %{
+      message: message
     })
   end
 
-  def send_json_resp(conn, :created, body) do
+  def send_json_error(conn, status, error) do
     conn
-    |> send_json_resp_by(201, %{
-      message: body
+    |> send_json_resp_by(status, %{
+      error: error
     })
   end
 
-  def send_json_resp(conn, :bad_request, body) do
+  def send_json_resp(conn, :ok, response) do
     conn
-    |> send_json_resp_by(400, %{
-      error: body
-    })
+    |> send_json_resp_by(200, response)
   end
 
-  def send_json_resp(conn, :not_found, body) do
+  def send_json_resp(conn, :created, response) do
     conn
-    |> send_json_resp_by(404, %{
-      error: body
-    })
+    |> send_json_resp_by(201, response)
   end
 
-  def send_json_resp(conn, :unprocessable_entity, body) do
+  def send_json_resp(conn, :bad_request, response) do
     conn
-    |> send_json_resp_by(422, %{
-      error: body
-    })
+    |> send_json_resp_by(400, response)
   end
 
-  def send_json_resp(conn, :internal_server_error, body) do
+  def send_json_resp(conn, :not_found, response) do
     conn
-    |> send_json_resp_by(500, %{
-      error: body
-    })
+    |> send_json_resp_by(404, response)
+  end
+
+  def send_json_resp(conn, :unprocessable_entity, response) do
+    conn
+    |> send_json_resp_by(422, response)
+  end
+
+  def send_json_resp(conn, :internal_server_error, response) do
+    conn
+    |> send_json_resp_by(500, response)
   end
 
   def send_json_resp_by(conn, status, body) do

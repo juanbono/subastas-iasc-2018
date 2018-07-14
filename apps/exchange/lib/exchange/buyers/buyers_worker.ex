@@ -70,7 +70,7 @@ defmodule Exchange.Buyers.Worker do
 
   def handle_cast({:bid_new, bid}, %Buyer{ip: ip, tags: tags} = state) do
     if has_tags_in_common?(bid.tags, tags) do
-      body = make_body(:new, bid)
+      body = make_body(bid)
       url = ip <> "/bids/open"
 
       spawn(fn -> send_request(body, url, state) end)
@@ -79,22 +79,22 @@ defmodule Exchange.Buyers.Worker do
     {:noreply, state}
   end
 
-  def handle_cast({:bid_updated, bid}, %Buyer{name: name, ip: ip} = state) do
-    body = make_body(:on_going, bid)
+  def handle_cast({:bid_updated, bid}, %Buyer{ip: ip} = state) do
+    body = make_body(bid)
     url = ip <> "/bids/new_offer"
 
     send_request(body, url, state)
   end
 
-  def handle_cast({:bid_cancelled, bid}, %Buyer{name: name, ip: ip} = state) do
-    body = make_body(:cancelled, bid)
+  def handle_cast({:bid_cancelled, bid}, %Buyer{ip: ip} = state) do
+    body = make_body(bid)
     url = ip <> "/bids/close"
 
     send_request(body, url, state)
   end
 
-  def handle_cast({:bid_finalized, bid}, %Buyer{name: name, ip: ip} = state) do
-    body = make_body(:finalized, bid)
+  def handle_cast({:bid_finalized, bid}, %Buyer{ip: ip} = state) do
+    body = make_body(bid)
     url = ip <> "/bids/close"
 
     send_request(body, url, state)
@@ -112,22 +112,14 @@ defmodule Exchange.Buyers.Worker do
   ## Funciones Auxiliares ##
   ##########################
 
-  defp make_body(state, %Bid{} = bid),
-    do:
-      Poison.encode!(%{
-        id: bid.bid_id,
-        json: bid.json,
-        price: bid.price,
-        tags: bid.tags,
-        state: state,
-        winner: bid.winner,
-        close_at: DateTime.from_unix!(bid.close_at)
-      })
+  defp make_body(%Bid{} = bid) do
+    Poison.encode!(Bid.to_map(bid))
+  end
 
-  defp send_request(body, url, state)
+  defp send_request(body, url, state) do
     res = HTTPoison.post!(url, body, [{"content-type", "application/json"}])
 
-    IO.inspect(res.body, label: "#{name} response body")
+    IO.inspect(res.body, label: "#{url} response body")
 
     {:noreply, state}
   end

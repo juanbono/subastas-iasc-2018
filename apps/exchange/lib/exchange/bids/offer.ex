@@ -29,6 +29,9 @@ defmodule Exchange.Bids.Offer do
       :invalid_id ->
         {:error, :invalid_id}
 
+      :error ->
+        {:error, "Bid ID must be present"}
+
       error ->
         {:error, error}
     end
@@ -44,6 +47,9 @@ defmodule Exchange.Bids.Offer do
       {:error, :bid_not_found} = not_found_err ->
         not_found_err
 
+      :error ->
+        {:error, "Price must be present"}
+
       _error ->
         {:error, :invalid_price}
     end
@@ -58,6 +64,9 @@ defmodule Exchange.Bids.Offer do
     else
       :invalid_name ->
         {:error, :invalid_name}
+
+      :error ->
+        {:error, "Buyer must be present"}
 
       error ->
         error

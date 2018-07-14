@@ -44,10 +44,12 @@ defmodule Exchange.Buyers do
   def notify_buyers(:cancelled, %Bid{} = bid) do
     current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify_cancelled(pid, bid) end)
+  end
 
   def notify_buyers(:finalized, %Bid{} = bid) do
     current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify_finalized(pid, bid) end)
+  end
 
   @doc """
   Cantidad de compradores en el sistema.

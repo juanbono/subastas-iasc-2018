@@ -31,6 +31,9 @@ defmodule Exchange.Buyers.Buyer do
       {:ok, ip} when is_binary(ip) ->
         Map.put(buyer, :ip, ip)
 
+      :error ->
+        {:error, "IP must be present"}
+
       _error ->
         {:error, :invalid_ip}
     end
@@ -46,6 +49,9 @@ defmodule Exchange.Buyers.Buyer do
       :invalid_name ->
         {:error, :invalid_name}
 
+      :error ->
+        {:error, "Name must be present"}
+
       # podemos manejar aca el caso en el que el server no tiene espacio?
       _error ->
         {:error, "Name is not present"}
@@ -58,6 +64,9 @@ defmodule Exchange.Buyers.Buyer do
     case Map.fetch(params, "tags") do
       {:ok, tags} when is_list(tags) ->
         Map.put(buyer, :tags, tags)
+
+      :error ->
+        {:error, "Tags must be present"}
 
       _error ->
         {:error, :invalid_tags}

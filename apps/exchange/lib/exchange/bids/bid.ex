@@ -38,12 +38,26 @@ defmodule Exchange.Bids.Bid do
       interested_buyers: nil
     }
 
+  def to_map(bid) do
+    %{
+      id: bid.bid_id,
+      json: bid.json,
+      price: bid.price,
+      tags: bid.tags,
+      winner: bid.winner,
+      close_at: bid.close_at
+    }
+  end
+
   defp check_price({:error, _reason} = err, _params), do: err
 
   defp check_price(bid, params) do
     case Map.fetch(params, "price") do
       {:ok, price} when price >= 0 ->
         Map.put(bid, :price, price)
+
+      :error ->
+        {:error, "Price must be present"}
 
       _error ->
         {:error, :invalid_price}
@@ -59,6 +73,9 @@ defmodule Exchange.Bids.Bid do
          {:ok, close_at_date} <- DateTime.from_unix(close_at) do
       Map.put(bid, :close_at, close_at_date)
     else
+      :error ->
+        {:error, "Close at must be present"}
+
       _err ->
         {:error, :invalid_close_at}
     end
@@ -70,6 +87,9 @@ defmodule Exchange.Bids.Bid do
     with {:ok, json} <- Map.fetch(params, "json") do
       Map.put(bid, :json, json)
     else
+      :error ->
+        {:error, "Json must be present"}
+
       _error ->
         {:error, :invalid_json}
     end
@@ -81,6 +101,9 @@ defmodule Exchange.Bids.Bid do
     case Map.fetch(params, "tags") do
       {:ok, tags} when is_list(tags) ->
         Map.put(bid, :tags, tags)
+
+      :error ->
+        {:error, "Tags must be present"}
 
       _error ->
         {:error, :invalid_tags}

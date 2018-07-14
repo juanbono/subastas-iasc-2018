@@ -33,7 +33,7 @@ defmodule Exchange.Bids do
     updated_bid = Bids.Worker.update(offer)
     Buyers.notify_buyers(:new, updated_bid)
 
-    {:ok, updated_bid.price}
+    {:ok, updated_bid}
   end
 
   @doc """
@@ -45,7 +45,8 @@ defmodule Exchange.Bids do
     {:ok, bid_pid} = DynamicSupervisor.start_child(Bids.Supervisor, {Bids.Worker, bid})
     {:ok, bid_state} = Bids.Worker.get_state(bid_pid)
     Buyers.notify_buyers(:new, bid_state)
-    {:ok, number_of_bids()}
+
+    {:ok, bid_state}
   end
 
   @doc """
