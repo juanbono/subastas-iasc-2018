@@ -16,10 +16,10 @@ curl -H "Content-Type: application/json" \
 ##########################################
 
 curl -H "Content-Type: application/json" \
-     -d '{"tags":["zapatos"], "price": 2.0, "duration": 20000, "json": {"id": 12, "name": "mimisho"}}' \
+     -d '{"price": 2700, "close_at": 1532690254, "json": {"name": "a table", "country": "Argentina"}, "tags": ["wood"]}' \
      http://localhost:4000/bids
 
 # request para probar actualizacion de bids
 curl -H "Content-Type: application/json" \
-     -d '{"buyer": "A", "price": 3.0, "bid_id": "d0a91a9e-8332-11e8-a88b-e8039a53f132"}' \
+     -d '{"bid_id": "10c026a0-87a6-11e8-b8d5-b808cfbd619a", "price": 2900}' \
      http://localhost:4000/bids/offer
