@@ -23,6 +23,13 @@ defmodule Exchange do
   end
 
   @doc """
+  Cancel una `apuesta` con los datos pasados como parametro.
+  """
+  def cancel_bid(offer_data) do
+    Bids.process(:cancel, offer_data)
+  end
+
+  @doc """
   Notifica a cada uno de los `compradores`
   en el sistema la creacion de una `apuesta`.
   """
@@ -40,10 +47,18 @@ defmodule Exchange do
 
   @doc """
   Notifica a cada uno de los `compradores`
+  en el sistema la cancelled de una `apuesta`.
+  """
+  def notify_bid_cancelled(bid) do
+    Buyers.notify_buyers(:cancelled, bid)
+  end
+
+  @doc """
+  Notifica a cada uno de los `compradores`
   en el sistema la finalización de una `apuesta`.
   """
-  def notify_bid_termination(bid) do
-    Buyers.notify_buyers(:termination, bid)
+  def notify_bid_finalized(bid) do
+    Buyers.notify_buyers(:finalized, bid)
   end
 
   @doc """

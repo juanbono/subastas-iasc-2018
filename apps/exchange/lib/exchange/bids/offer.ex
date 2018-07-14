@@ -29,6 +29,9 @@ defmodule Exchange.Bids.Offer do
       :invalid_id ->
         {:error, :invalid_id}
 
+      :error ->
+        {:error, "Bid ID must be present"}
+
       error ->
         {:error, error}
     end
@@ -38,11 +41,14 @@ defmodule Exchange.Bids.Offer do
 
   defp check_price(offer, params) do
     with {:ok, %Bid{price: current_price}} <- Bids.get_bid(params["bid_id"]),
-         {:ok, price} when price > current_price <- Map.fetch(params, "price") do
+         {:ok, price} when is_number(price) and price > current_price <- Map.fetch(params, "price") do
       Map.put(offer, :price, price)
     else
       {:error, :bid_not_found} = not_found_err ->
         not_found_err
+
+      :error ->
+        {:error, "Price must be present"}
 
       _error ->
         {:error, :invalid_price}
@@ -58,6 +64,9 @@ defmodule Exchange.Bids.Offer do
     else
       :invalid_name ->
         {:error, :invalid_name}
+
+      :error ->
+        {:error, "Buyer must be present"}
 
       error ->
         error

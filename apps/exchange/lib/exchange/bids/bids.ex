@@ -11,6 +11,22 @@ defmodule Exchange.Bids do
     |> apply()
   end
 
+  def process(:cancel, params) do
+    with {:ok, bid_id} <- Map.fetch(params, "bid_id"),
+         :ok <- Bids.exists?(bid_id) do
+      Bids.Worker.cancel(bid_id)
+    else
+      :invalid_id ->
+        {:error, :invalid_id}
+
+      :error ->
+        {:error, "Bid ID must be present"}
+
+      error ->
+        {:error, error}
+    end
+  end
+
   @doc """
   Aplica una `oferta`. En caso de que el argumento pasado sea un error, lo devuelve.
   """
@@ -18,9 +34,9 @@ defmodule Exchange.Bids do
 
   def apply(%Offer{} = offer) do
     updated_bid = Bids.Worker.update(offer)
-    Buyers.notify_buyers(:new, updated_bid)
+    Buyers.notify_buyers(:update, updated_bid)
 
-    {:ok, updated_bid.price}
+    {:ok, updated_bid}
   end
 
   @doc """
@@ -32,7 +48,8 @@ defmodule Exchange.Bids do
     {:ok, bid_pid} = DynamicSupervisor.start_child(Bids.Supervisor, {Bids.Worker, bid})
     {:ok, bid_state} = Bids.Worker.get_state(bid_pid)
     Buyers.notify_buyers(:new, bid_state)
-    {:ok, number_of_bids()}
+
+    {:ok, bid_state}
   end
 
   @doc """
