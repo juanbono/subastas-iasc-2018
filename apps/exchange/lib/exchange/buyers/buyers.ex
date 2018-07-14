@@ -37,14 +37,12 @@ defmodule Exchange.Buyers do
   end
 
   def notify_buyers(:update, %Bid{} = bid) do
-    bid.interested_buyers
-    |> names_to_pids()
+    current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify_update(pid, bid) end)
   end
 
   def notify_buyers(:termination, %Bid{} = bid) do
-    bid.interested_buyers
-    |> names_to_pids()
+    current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify_termination(pid, bid) end)
   end
 

@@ -7,7 +7,8 @@ defmodule Client.Router do
   plug(:dispatch)
 
   post "/bids/open" do
-    Task.async(fn -> Client.OfferLogic.process(conn.body_params) end)
+    # Task.async(fn -> Client.OfferLogic.process(conn.body_params) end)
+    Client.handle_open(conn.body_params)
 
     conn
     |> put_resp_content_type("application/json")
@@ -15,7 +16,8 @@ defmodule Client.Router do
   end
 
   post "/bids/new_offer" do
-    Task.async(fn -> Client.OfferLogic.process(conn.body_params) end)
+    # Task.async(fn -> Client.OfferLogic.process(conn.body_params) end)
+    Client.handle_offer(conn.body_params)
 
     conn
     |> put_resp_content_type("application/json")
@@ -23,6 +25,9 @@ defmodule Client.Router do
   end
 
   post "/bids/close" do
+    # IO.inspect(conn.body_params, label: "bid finalizada, se recibio")
+    Client.handle_close(conn.body_params)
+
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(200, Poison.encode!(%{message: "Ok, bid finalization received!\n"}))

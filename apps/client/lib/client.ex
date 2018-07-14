@@ -1,18 +1,57 @@
 defmodule Client do
   @moduledoc """
-  Documentation for Client.
+  Sample client.
   """
+  require Integer
 
-  @doc """
-  Hello world.
+  def handle_open(bid_data) do
+    IO.inspect(bid_data, label: "Nueva apuesta")
 
-  ## Examples
+    if make_offer?(bid_data) do
+      offer = offer_params(bid_data)
+      send_offer(url(), offer)
+    end
+  end
 
-      iex> Client.hello
-      :world
+  def handle_offer(bid_data) do
+    IO.inspect(bid_data, label: "Apuesta actualizada")
 
-  """
-  def hello do
-    :world
+    if make_offer?(bid_data) do
+      offer = offer_params(bid_data)
+      send_offer(url(), offer)
+    end
+  end
+
+  def handle_close(bid_data) do
+    IO.inspect(bid_data, label: "Apuesta terminada")
+    IO.inspect(bid_data["winner"], label: "Ganador")
+  end
+
+  defp client_name() do
+    Node.self()
+    |> Atom.to_string()
+    |> String.first()
+  end
+
+  defp make_offer?(bid_data) do
+    is_good_offer = Enum.member?(bid_data["tags"], "zapatos") && bid_data["price"] < 100
+    is_good_offer && Integer.is_even(:rand.uniform(2))
+  end
+
+  defp offer_params(bid_data) do
+    Poison.encode!(%{
+      buyer: client_name(),
+      price: bid_data["price"] + 1,
+      bid_id: bid_data["id"]
+    })
+  end
+
+  defp send_offer(url, offer) do
+    IO.inspect(offer, label: "voy a enviar estos parametros \n")
+    spawn(fn -> HTTPoison.post!(url, offer, [{"content-type", "application/json"}]) end)
+  end
+
+  defp url() do
+    "http://localhost:4000/bids/offer"
   end
 end

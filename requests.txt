@@ -1,11 +1,22 @@
-# request para probar /buyers
+###########################################
+####### Requests para probar /buyers ######
+###########################################
+# Comprador A 
 curl -H "Content-Type: application/json" \
-     -d '{"name":"A", "ip":"127.0.0.1:5000", "tags":["cats"]}' \
+     -d '{"name": "A", "ip":"127.0.0.1:5001", "tags":["zapatos"]}' \
      http://localhost:4000/buyers
 
-# request para probar /bids
+# Comprador B
 curl -H "Content-Type: application/json" \
-     -d '{"tags":["cats", "pets"], "price": 2.0, "duration": 5000, "json": {"id": 12, "name": "mimisho"}}' \
+     -d '{"name": "B", "ip":"127.0.0.1:5002", "tags":["zapatos", "joyas"]}' \
+     http://localhost:4000/buyers
+
+##########################################
+###### Requests para probar /bids ########
+##########################################
+
+curl -H "Content-Type: application/json" \
+     -d '{"tags":["zapatos"], "price": 2.0, "duration": 20000, "json": {"id": 12, "name": "mimisho"}}' \
      http://localhost:4000/bids
 
 # request para probar actualizacion de bids
