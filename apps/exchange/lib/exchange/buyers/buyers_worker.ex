@@ -65,9 +65,7 @@ defmodule Exchange.Buyers.Worker do
       json_bid = make_body(:new, bid)
       url = ip <> "/bids/open"
 
-      res = HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}])
-
-      IO.inspect(res.body, label: "response body")
+      spawn(fn -> HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}]) end)
     end
 
     {:noreply, state}

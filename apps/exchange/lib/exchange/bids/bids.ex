@@ -29,8 +29,9 @@ defmodule Exchange.Bids do
   def register({:error, _} = error), do: error
 
   def register(%Bid{} = bid) do
-    DynamicSupervisor.start_child(Bids.Supervisor, {Bids.Worker, bid})
-    Buyers.notify_buyers(:new, bid)
+    {:ok, bid_pid} = DynamicSupervisor.start_child(Bids.Supervisor, {Bids.Worker, bid})
+    {:ok, bid_state} = Bids.Worker.get_state(bid_pid)
+    Buyers.notify_buyers(:new, bid_state)
     {:ok, number_of_bids()}
   end
 
@@ -72,6 +73,6 @@ defmodule Exchange.Bids do
       Bids.current_bids()
       |> Enum.map(fn bid_pid -> Bids.Worker.bid_id(bid_pid) end)
 
-    if Enum.member?(bids, bid_id), do: :ok, else: :invalid_bid_id
+    if Enum.member?(bids, bid_id), do: :ok, else: :invalid_id
   end
 end

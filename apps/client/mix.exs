@@ -18,7 +18,7 @@ defmodule Client.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :cowboy, :plug, :httpoison],
+      extra_applications: [:logger, :cowboy, :plug, :httpoison, :confex],
       mod: {Client.Application, []}
     ]
   end
@@ -29,7 +29,8 @@ defmodule Client.MixProject do
       {:cowboy, "~> 2.4.0"},
       {:plug, "~> 1.5.1"},
       {:poison, "~> 3.1"},
-      {:httpoison, "~> 1.2.0"}
+      {:httpoison, "~> 1.2.0"},
+      {:confex, "~> 3.3.1"}
     ]
   end
 end

@@ -18,7 +18,7 @@ defmodule Exchange.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :cowboy, :plug, :httpoison],
+      extra_applications: [:logger, :cowboy, :plug, :httpoison, :confex],
       mod: {Exchange.Application, []}
     ]
   end
@@ -32,7 +32,8 @@ defmodule Exchange.MixProject do
       {:httpoison, "~> 1.2.0"},
       {:amnesia, "~> 0.2.7"},
       {:elixir_uuid, "~> 1.2"},
-      {:unsplit, git: "https://github.com/discordapp/unsplit"}
+      {:unsplit, git: "https://github.com/discordapp/unsplit"},
+      {:confex, "~> 3.3.1"}
     ]
   end
 end
