@@ -84,12 +84,12 @@ defmodule Exchange.Bids.Worker do
   end
 
   def handle_cast({:cancel}, state) do
-    Buyers.notify_buyers(:cancel, state)
+    Buyers.notify_buyers(:cancelled, state)
     Process.exit(self(), :normal)
   end
 
   def handle_info(:timeout, state) do
-    Buyers.notify_buyers(:termination, state)
+    Buyers.notify_buyers(:finalized, state)
     Process.exit(self(), :normal)
   end
 

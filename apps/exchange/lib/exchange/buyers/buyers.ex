@@ -29,7 +29,7 @@ defmodule Exchange.Buyers do
 
   @doc """
   Notifica a cada uno de los `compradores` en el sistema la creacion,
-  actualización o finalización de una `apuesta`.
+  actualización, cancelación o finalización de una `apuesta`.
   """
   def notify_buyers(:new, %Bid{} = bid) do
     current_buyers()
@@ -41,14 +41,13 @@ defmodule Exchange.Buyers do
     |> Enum.each(fn pid -> Buyers.Worker.notify_update(pid, bid) end)
   end
 
-  def notify_buyers(:termination, %Bid{} = bid) do
+  def notify_buyers(:cancelled, %Bid{} = bid) do
     current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify_termination(pid, bid) end)
-  end
+    |> Enum.each(fn pid -> Buyers.Worker.notify_cancelled(pid, bid) end)
 
-  # TODO
-  def notify_buyers(:cancel, %Bid{} = bid) do
-  end
+  def notify_buyers(:finalized, %Bid{} = bid) do
+    current_buyers()
+    |> Enum.each(fn pid -> Buyers.Worker.notify_finalized(pid, bid) end)
 
   @doc """
   Cantidad de compradores en el sistema.

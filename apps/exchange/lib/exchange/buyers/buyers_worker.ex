@@ -18,7 +18,7 @@ defmodule Exchange.Buyers.Worker do
   una `apuesta`.
   """
   def notify_new(pid, %Bid{} = bid) do
-    GenServer.cast(pid, {:bid_created, bid})
+    GenServer.cast(pid, {:bid_new, bid})
   end
 
   @doc """
@@ -31,10 +31,18 @@ defmodule Exchange.Buyers.Worker do
 
   @doc """
   Notifica al comprador con el `pid` dado sobre
+  la cancelación de una `apuesta`.
+  """
+  def notify_cancelled(pid, %Bid{} = bid) do
+    GenServer.cast(pid, {:bid_cancelled, bid})
+  end
+
+  @doc """
+  Notifica al comprador con el `pid` dado sobre
   la finalización de una `apuesta`.
   """
-  def notify_termination(pid, %Bid{} = bid) do
-    GenServer.cast(pid, {:bid_terminated, bid})
+  def notify_finalized(pid, %Bid{} = bid) do
+    GenServer.cast(pid, {:bid_finalized, bid})
   end
 
   @doc """
@@ -60,37 +68,36 @@ defmodule Exchange.Buyers.Worker do
     GenServer.start_link(__MODULE__, buyer_data, debug: [:statistics, :trace])
   end
 
-  def handle_cast({:bid_created, bid}, %Buyer{ip: ip, tags: tags} = state) do
+  def handle_cast({:bid_new, bid}, %Buyer{ip: ip, tags: tags} = state) do
     if has_tags_in_common?(bid.tags, tags) do
-      json_bid = make_body(:new, bid)
+      body = make_body(:new, bid)
       url = ip <> "/bids/open"
 
-      spawn(fn -> HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}]) end)
+      spawn(fn -> send_request(body, url, state) end)
     end
 
     {:noreply, state}
   end
 
   def handle_cast({:bid_updated, bid}, %Buyer{name: name, ip: ip} = state) do
-    json_bid = make_body(:update, bid)
+    body = make_body(:on_going, bid)
     url = ip <> "/bids/new_offer"
 
-    res = HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}])
-
-    IO.inspect(res.body, label: "#{name} response body")
-
-    {:noreply, state}
+    send_request(body, url, state)
   end
 
-  def handle_cast({:bid_terminated, bid}, %Buyer{name: name, ip: ip} = state) do
-    json_bid = make_body(:termination, bid)
+  def handle_cast({:bid_cancelled, bid}, %Buyer{name: name, ip: ip} = state) do
+    body = make_body(:cancelled, bid)
     url = ip <> "/bids/close"
 
-    res = HTTPoison.post!(url, json_bid, [{"content-type", "application/json"}])
+    send_request(body, url, state)
+  end
 
-    IO.inspect(res.body, label: "#{name} response body")
+  def handle_cast({:bid_finalized, bid}, %Buyer{name: name, ip: ip} = state) do
+    body = make_body(:finalized, bid)
+    url = ip <> "/bids/close"
 
-    {:noreply, state}
+    send_request(body, url, state)
   end
 
   def handle_call({:get_name}, _from, %Buyer{name: name} = state) do
@@ -105,33 +112,25 @@ defmodule Exchange.Buyers.Worker do
   ## Funciones Auxiliares ##
   ##########################
 
-  defp make_body(:new, %Bid{} = bid),
+  defp make_body(state, %Bid{} = bid),
     do:
       Poison.encode!(%{
         id: bid.bid_id,
         json: bid.json,
         price: bid.price,
         tags: bid.tags,
-        close_at: DateTime.from_unix!(bid.close_at)
-      })
-
-  defp make_body(:update, %Bid{} = bid),
-    do:
-      Poison.encode!(%{
-        id: bid.bid_id,
-        price: bid.price,
+        state: state,
         winner: bid.winner,
         close_at: DateTime.from_unix!(bid.close_at)
       })
 
-  defp make_body(:termination, %Bid{} = bid),
-    do:
-      Poison.encode!(%{
-        id: bid.bid_id,
-        price: bid.price,
-        winner: bid.winner,
-        close_at: DateTime.from_unix!(bid.close_at)
-      })
+  defp send_request(body, url, state)
+    res = HTTPoison.post!(url, body, [{"content-type", "application/json"}])
+
+    IO.inspect(res.body, label: "#{name} response body")
+
+    {:noreply, state}
+  end
 
   defp has_tags_in_common?(bid_tags, buyer_tags) do
     bid_tags
