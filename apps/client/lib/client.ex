@@ -48,8 +48,7 @@ defmodule Client do
 
   defp send_offer(url, offer) do
     IO.inspect(offer, label: "voy a enviar estos parametros \n")
-    res = HTTPoison.post!(url, offer, [{"content-type", "application/json"}])
-    IO.inspect(res, label: "recibido luego de ofertar")
+    spawn(fn -> HTTPoison.post!(url, offer, [{"content-type", "application/json"}]) end)
   end
 
   defp url() do
