@@ -1,6 +1,5 @@
 defmodule Exchange.Router do
   use Plug.Router
-  alias Exchange.{Bids.Bid}
 
   plug(Plug.Logger)
   plug(Plug.Parsers, parsers: [:json], json_decoder: Poison)
@@ -59,7 +58,7 @@ defmodule Exchange.Router do
   defp handle_response(result, :bids_endpoint, conn) do
     case result do
       {:ok, bid} ->
-        send_json_resp(conn, :created, Bid.to_map(bid))
+        send_json_resp(conn, :created, encode_bid(bid))
 
       {:error, :invalid_close_at} ->
         send_json_error(conn, :bad_request, "Invalid close at")
@@ -89,7 +88,7 @@ defmodule Exchange.Router do
   defp handle_response(result, :new_offer_endpoint, conn) do
     case result do
       {:ok, bid} ->
-        send_json_resp(conn, :created, Bid.to_map(bid))
+        send_json_resp(conn, :created, encode_bid(bid))
 
       {:error, reason} ->
         send_json_error(conn, :bad_request, "Invalid bid: #{reason}")
@@ -145,5 +144,17 @@ defmodule Exchange.Router do
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(status, Poison.encode!(body))
+  end
+
+  defp encode_bid(bid) do
+    %{
+      id: bid.bid_id,
+      json: bid.json,
+      price: bid.price,
+      tags: bid.tags,
+      winner: bid.winner,
+      close_at: bid.close_at,
+      state: bid.state
+    }
   end
 end

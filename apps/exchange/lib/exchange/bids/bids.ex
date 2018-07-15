@@ -1,5 +1,5 @@
 defmodule Exchange.Bids do
-  alias Exchange.{Bids, Bids.Bid, Bids.Offer, Buyers}
+  alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
 
   def process(:bid, params) do
     Bid.make(params)
@@ -13,7 +13,7 @@ defmodule Exchange.Bids do
 
   def process(:cancel, params) do
     with {:ok, bid_id} <- Map.fetch(params, "bid_id"),
-         :ok <- Bids.exists?(bid_id) do
+         :ok <- exists?(bid_id) do
       Bids.Worker.cancel(bid_id)
     else
       :invalid_id ->
@@ -34,7 +34,7 @@ defmodule Exchange.Bids do
 
   def apply(%Offer{} = offer) do
     updated_bid = Bids.Worker.update(offer)
-    Buyers.notify_buyers(:update, updated_bid)
+    Buyers.Local.notify_buyers(:update, updated_bid)
 
     {:ok, updated_bid}
   end
@@ -42,28 +42,25 @@ defmodule Exchange.Bids do
   @doc """
   Registra una apuesta en el sistema.
   """
-  def register({:error, _} = error), do: error
-
   def register(%Bid{} = bid) do
-    {:ok, bid_pid} = DynamicSupervisor.start_child(Bids.Supervisor, {Bids.Worker, bid})
-    {:ok, bid_state} = Bids.Worker.get_state(bid_pid)
-    Buyers.notify_buyers(:new, bid_state)
-
-    {:ok, bid_state}
+    with {:ok, bid_state} <- Bids.Supervisor.register(bid) do
+      Buyers.Local.notify_buyers(:new, bid_state)
+      {:ok, bid_state}
+    else
+      error ->
+        error
+    end
   end
 
   @doc """
   Devuelve una lista con los PIDs de las `apuestas` en el sistema.
   """
-  def current_bids() do
-    DynamicSupervisor.which_children(Bids.Supervisor)
-    |> Enum.map(fn {_, pid, _, _} -> pid end)
-  end
+  defdelegate current_bids, to: Bids.Supervisor
 
   @doc """
   Cantidad de `apuestas` en el sistema.
   """
-  def number_of_bids(), do: DynamicSupervisor.count_children(Bids.Supervisor).workers
+  defdelegate number_of_bids, to: Bids.Supervisor
 
   @doc """
   Devuelve los datos de la `apuesta` con el `id` dado.
@@ -87,7 +84,7 @@ defmodule Exchange.Bids do
   """
   def exists?(bid_id) do
     bids =
-      Bids.current_bids()
+      current_bids()
       |> Enum.map(fn bid_pid -> Bids.Worker.bid_id(bid_pid) end)
 
     if Enum.member?(bids, bid_id), do: :ok, else: :invalid_id
