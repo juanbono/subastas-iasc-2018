@@ -55,12 +55,12 @@ defmodule Exchange.Bids do
   @doc """
   Devuelve una lista con los PIDs de las `apuestas` en el sistema.
   """
-  def current_bids(), do: Bids.Supervisor.current_bids()
+  defdelegate current_bids, to: Bids.Supervisor
 
   @doc """
   Cantidad de `apuestas` en el sistema.
   """
-  def number_of_bids(), do: Bids.Supervisor.number_of_bids()
+  defdelegate number_of_bids, to: Bids.Supervisor
 
   @doc """
   Devuelve los datos de la `apuesta` con el `id` dado.
@@ -84,7 +84,7 @@ defmodule Exchange.Bids do
   """
   def exists?(bid_id) do
     bids =
-      Bids.current_bids()
+      current_bids()
       |> Enum.map(fn bid_pid -> Bids.Worker.bid_id(bid_pid) end)
 
     if Enum.member?(bids, bid_id), do: :ok, else: :invalid_id

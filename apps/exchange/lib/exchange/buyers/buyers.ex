@@ -44,7 +44,7 @@ defmodule Exchange.Buyers do
   @doc """
   Cantidad de compradores en el sistema.
   """
-  def number_of_buyers(), do: Buyers.Supervisor.number_of_buyers()
+  defdelegate number_of_buyers, to: Buyers.Supervisor
 
   @doc """
   Comprueba la existencia en el sistema de un `comprador` con nombre `name`.

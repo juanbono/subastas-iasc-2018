@@ -64,14 +64,10 @@ defmodule Exchange do
   @doc """
   Cantidad de `compradores` en el sistema.
   """
-  def number_of_buyers() do
-    Buyers.number_of_buyers()
-  end
+  defdelegate number_of_buyers, to: Buyers
 
   @doc """
   Cantidad de `apuestas` en el sistema.
   """
-  def number_of_bids() do
-    Bids.number_of_bids()
-  end
+  defdelegate number_of_bids, to: Bids
 end

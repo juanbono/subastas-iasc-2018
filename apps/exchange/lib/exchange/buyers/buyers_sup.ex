@@ -13,14 +13,14 @@ defmodule Exchange.Buyers.Supervisor do
   def register({:error, _} = error), do: error
 
   def register(%Buyer{} = buyer) do
-    DynamicSupervisor.start_child(Buyers.Supervisor, {Buyers.Worker, buyer})
+    DynamicSupervisor.start_child(__MODULE__, {Buyers.Worker, buyer})
   end
 
   @doc """
   Devuelve una lista con los PIDs de los compradores en el sistema.
   """
   def current_buyers() do
-    DynamicSupervisor.which_children(Buyers.Supervisor)
+    DynamicSupervisor.which_children(__MODULE__)
     |> Enum.map(fn {_, pid, _, _} -> pid end)
   end
 
@@ -28,7 +28,7 @@ defmodule Exchange.Buyers.Supervisor do
   Cantidad de compradores en el sistema.
   """
   def number_of_buyers() do
-    DynamicSupervisor.count_children(Buyers.Supervisor).workers
+    DynamicSupervisor.count_children(__MODULE__).workers
   end
 
   def names_to_pids(buyer_names) do
