@@ -73,7 +73,7 @@ defmodule Exchange.Buyers.Worker do
       body = make_body(bid)
       url = ip <> "/bids/open"
 
-      spawn(fn -> send_request(body, url, state) end)
+      spawn(fn -> send_request(body, url) end)
     end
 
     {:noreply, state}
@@ -83,21 +83,27 @@ defmodule Exchange.Buyers.Worker do
     body = make_body(bid)
     url = ip <> "/bids/new_offer"
 
-    send_request(body, url, state)
+    send_request(body, url)
+
+    {:noreply, state}
   end
 
   def handle_cast({:bid_cancelled, bid}, %Buyer{ip: ip} = state) do
     body = make_body(bid)
     url = ip <> "/bids/close"
 
-    send_request(body, url, state)
+    send_request(body, url)
+
+    {:noreply, state}
   end
 
   def handle_cast({:bid_finalized, bid}, %Buyer{ip: ip} = state) do
     body = make_body(bid)
     url = ip <> "/bids/close"
 
-    send_request(body, url, state)
+    send_request(body, url)
+
+    {:noreply, state}
   end
 
   def handle_call({:get_name}, _from, %Buyer{name: name} = state) do
@@ -116,12 +122,10 @@ defmodule Exchange.Buyers.Worker do
     Poison.encode!(Bid.to_map(bid))
   end
 
-  defp send_request(body, url, state) do
+  defp send_request(body, url) do
     res = HTTPoison.post!(url, body, [{"content-type", "application/json"}])
 
     IO.inspect(res.body, label: "#{url} response body")
-
-    {:noreply, state}
   end
 
   defp has_tags_in_common?(bid_tags, buyer_tags) do
