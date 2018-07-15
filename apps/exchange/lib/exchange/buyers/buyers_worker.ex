@@ -1,6 +1,6 @@
 defmodule Exchange.Buyers.Worker do
   use GenServer
-  alias Exchange.{Buyers.Buyer, Bids.Bid}
+  alias Exchange.Buyers.Buyer
 
   #######################
   ## Funciones Cliente ##
@@ -17,7 +17,7 @@ defmodule Exchange.Buyers.Worker do
   Notifica al comprador con el `pid` dado sobre la creacion de
   una `apuesta`.
   """
-  def notify_new(pid, %Bid{} = bid) do
+  def notify_new(pid, bid) do
     GenServer.cast(pid, {:bid_new, bid})
   end
 
@@ -25,7 +25,7 @@ defmodule Exchange.Buyers.Worker do
   Notifica al comprador con el `pid` dado sobre
   la actualización de una `apuesta`.
   """
-  def notify_update(pid, %Bid{} = bid) do
+  def notify_update(pid, bid) do
     GenServer.cast(pid, {:bid_updated, bid})
   end
 
@@ -33,7 +33,7 @@ defmodule Exchange.Buyers.Worker do
   Notifica al comprador con el `pid` dado sobre
   la cancelación de una `apuesta`.
   """
-  def notify_cancelled(pid, %Bid{} = bid) do
+  def notify_cancelled(pid, bid) do
     GenServer.cast(pid, {:bid_cancelled, bid})
   end
 
@@ -41,7 +41,7 @@ defmodule Exchange.Buyers.Worker do
   Notifica al comprador con el `pid` dado sobre
   la finalización de una `apuesta`.
   """
-  def notify_finalized(pid, %Bid{} = bid) do
+  def notify_finalized(pid, bid) do
     GenServer.cast(pid, {:bid_finalized, bid})
   end
 
@@ -65,7 +65,7 @@ defmodule Exchange.Buyers.Worker do
   end
 
   def start_link(buyer_data) do
-    GenServer.start_link(__MODULE__, buyer_data, debug: [:statistics, :trace])
+    GenServer.start_link(__MODULE__, buyer_data)
   end
 
   def handle_cast({:bid_new, bid}, %Buyer{ip: ip, tags: tags} = state) do
@@ -118,8 +118,8 @@ defmodule Exchange.Buyers.Worker do
   ## Funciones Auxiliares ##
   ##########################
 
-  defp make_body(%Bid{} = bid) do
-    Poison.encode!(Bid.to_map(bid))
+  defp make_body(bid) do
+    Poison.encode!(encode_bid(bid))
   end
 
   defp send_request(body, url) do
@@ -131,5 +131,17 @@ defmodule Exchange.Buyers.Worker do
   defp has_tags_in_common?(bid_tags, buyer_tags) do
     bid_tags
     |> Enum.any?(fn tag -> Enum.member?(buyer_tags, tag) end)
+  end
+
+  defp encode_bid(bid) do
+    %{
+      id: bid.bid_id,
+      json: bid.json,
+      price: bid.price,
+      tags: bid.tags,
+      winner: bid.winner,
+      close_at: bid.close_at,
+      state: bid.state
+    }
   end
 end

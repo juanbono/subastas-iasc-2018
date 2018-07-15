@@ -34,7 +34,7 @@ defmodule Exchange do
   en el sistema la creacion de una `apuesta`.
   """
   def notify_bid_creation(bid) do
-    Buyers.notify_buyers(:new, bid)
+    Buyers.Interfaces.Local.notify_buyers(:new, bid)
   end
 
   @doc """
@@ -42,7 +42,7 @@ defmodule Exchange do
   en el sistema la actualización de una `apuesta`.
   """
   def notify_bid_update(bid) do
-    Buyers.notify_buyers(:update, bid)
+    Buyers.Interfaces.Local.notify_buyers(:update, bid)
   end
 
   @doc """
@@ -50,7 +50,7 @@ defmodule Exchange do
   en el sistema la cancelled de una `apuesta`.
   """
   def notify_bid_cancelled(bid) do
-    Buyers.notify_buyers(:cancelled, bid)
+    Buyers.Interfaces.Local.notify_buyers(:cancelled, bid)
   end
 
   @doc """
@@ -58,7 +58,7 @@ defmodule Exchange do
   en el sistema la finalización de una `apuesta`.
   """
   def notify_bid_finalized(bid) do
-    Buyers.notify_buyers(:finalized, bid)
+    Buyers.Interfaces.Local.notify_buyers(:finalized, bid)
   end
 
   @doc """

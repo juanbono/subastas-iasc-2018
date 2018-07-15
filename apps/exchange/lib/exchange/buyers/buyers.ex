@@ -1,5 +1,5 @@
 defmodule Exchange.Buyers do
-  alias Exchange.{Buyers, Buyers.Buyer, Bids.Bid}
+  alias Exchange.{Buyers, Buyers.Buyer}
 
   @doc """
   Valida los datos dados y registra a un nuevo `comprador` con ellos.
@@ -19,26 +19,6 @@ defmodule Exchange.Buyers do
       error ->
         error
     end
-  end
-
-  def notify_buyers(:new, %Bid{} = bid) do
-    Buyers.Supervisor.current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify_new(pid, bid) end)
-  end
-
-  def notify_buyers(:update, %Bid{} = bid) do
-    Buyers.Supervisor.current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify_update(pid, bid) end)
-  end
-
-  def notify_buyers(:cancelled, %Bid{} = bid) do
-    Buyers.Supervisor.current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify_cancelled(pid, bid) end)
-  end
-
-  def notify_buyers(:finalized, %Bid{} = bid) do
-    Buyers.Supervisor.current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify_finalized(pid, bid) end)
   end
 
   @doc """

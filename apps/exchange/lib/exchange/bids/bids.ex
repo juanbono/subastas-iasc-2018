@@ -34,7 +34,7 @@ defmodule Exchange.Bids do
 
   def apply(%Offer{} = offer) do
     updated_bid = Bids.Worker.update(offer)
-    Buyers.notify_buyers(:update, updated_bid)
+    Buyers.Interfaces.Local.notify_buyers(:update, updated_bid)
 
     {:ok, updated_bid}
   end
@@ -44,7 +44,7 @@ defmodule Exchange.Bids do
   """
   def register(%Bid{} = bid) do
     with {:ok, bid_state} <- Bids.Supervisor.register(bid) do
-      Buyers.notify_buyers(:new, bid_state)
+      Buyers.Interfaces.Local.notify_buyers(:new, bid_state)
       {:ok, bid_state}
     else
       error ->

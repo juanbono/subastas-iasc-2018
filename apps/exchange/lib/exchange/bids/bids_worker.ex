@@ -85,19 +85,19 @@ defmodule Exchange.Bids.Worker do
   end
 
   def handle_cast({:cancel}, state) do
-    Buyers.notify_buyers(:cancelled, %{state | state: "cancelled"})
+    Buyers.Interfaces.Local.notify_buyers(:cancelled, %{state | state: "cancelled"})
 
     Process.exit(self(), :normal)
   end
 
   def handle_info(:finalize, state) do
-    Buyers.notify_buyers(:finalized, %{state | state: "finalized"})
+    Buyers.Interfaces.Local.notify_buyers(:finalized, %{state | state: "finalized"})
 
     Process.exit(self(), :normal)
   end
 
   def schedule_timeout(bid) do
-    duration = DateTime.diff(bid.close_at, DateTime.utc_now) * 1000
+    duration = DateTime.diff(bid.close_at, DateTime.utc_now()) * 1000
     Process.send_after(self(), :finalize, duration)
   end
 end

@@ -40,23 +40,11 @@ defmodule Exchange.Bids.Bid do
       state: "new"
     }
 
-  def to_map(bid) do
-    %{
-      id: bid.bid_id,
-      json: bid.json,
-      price: bid.price,
-      tags: bid.tags,
-      winner: bid.winner,
-      close_at: bid.close_at,
-      state: bid.state
-    }
-  end
-
   defp check_price({:error, _reason} = err, _params), do: err
 
   defp check_price(bid, params) do
     case Map.fetch(params, "price") do
-      {:ok, price} when is_number(price) and(price >= 0) ->
+      {:ok, price} when is_number(price) and price >= 0 ->
         Map.put(bid, :price, price)
 
       :error ->
@@ -72,7 +60,8 @@ defmodule Exchange.Bids.Bid do
   defp check_close_at(bid, params) do
     now_to_unix = DateTime.to_unix(DateTime.utc_now()) + 5
 
-    with {:ok, close_at} when is_integer(close_at) and (close_at > now_to_unix) <- Map.fetch(params, "close_at"),
+    with {:ok, close_at} when is_integer(close_at) and close_at > now_to_unix <-
+           Map.fetch(params, "close_at"),
          {:ok, close_at_date} <- DateTime.from_unix(close_at) do
       Map.put(bid, :close_at, close_at_date)
     else
