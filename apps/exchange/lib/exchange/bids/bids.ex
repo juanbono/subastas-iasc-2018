@@ -1,5 +1,5 @@
 defmodule Exchange.Bids do
-  alias Exchange.{Bids, Bids.Bid, Bids.Offer, Buyers}
+  alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
 
   def process(:bid, params) do
     Bid.make(params)
@@ -13,7 +13,7 @@ defmodule Exchange.Bids do
 
   def process(:cancel, params) do
     with {:ok, bid_id} <- Map.fetch(params, "bid_id"),
-         :ok <- Bids.exists?(bid_id) do
+         :ok <- exists?(bid_id) do
       Bids.Worker.cancel(bid_id)
     else
       :invalid_id ->
@@ -34,7 +34,7 @@ defmodule Exchange.Bids do
 
   def apply(%Offer{} = offer) do
     updated_bid = Bids.Worker.update(offer)
-    Buyers.Interfaces.Local.notify_buyers(:update, updated_bid)
+    Buyers.Local.notify_buyers(:update, updated_bid)
 
     {:ok, updated_bid}
   end
@@ -44,7 +44,7 @@ defmodule Exchange.Bids do
   """
   def register(%Bid{} = bid) do
     with {:ok, bid_state} <- Bids.Supervisor.register(bid) do
-      Buyers.Interfaces.Local.notify_buyers(:new, bid_state)
+      Buyers.Local.notify_buyers(:new, bid_state)
       {:ok, bid_state}
     else
       error ->

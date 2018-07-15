@@ -4,7 +4,7 @@ defmodule Exchange.Bids.Worker do
   Debe destruirse luego de pasado el tiempo especificado en la `apuesta`.
   """
   use GenServer, restart: :transient
-  alias Exchange.{Bids, Bids.Bid, Bids.Offer, Buyers}
+  alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
 
   #######################
   ## Funciones Cliente ##
@@ -85,13 +85,13 @@ defmodule Exchange.Bids.Worker do
   end
 
   def handle_cast({:cancel}, state) do
-    Buyers.Interfaces.Local.notify_buyers(:cancelled, %{state | state: "cancelled"})
+    Buyers.Local.notify_buyers(:cancelled, %{state | state: "cancelled"})
 
     Process.exit(self(), :normal)
   end
 
   def handle_info(:finalize, state) do
-    Buyers.Interfaces.Local.notify_buyers(:finalized, %{state | state: "finalized"})
+    Buyers.Local.notify_buyers(:finalized, %{state | state: "finalized"})
 
     Process.exit(self(), :normal)
   end

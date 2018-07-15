@@ -43,7 +43,7 @@ defmodule Exchange.Buyers.Buyer do
 
   defp check_name(buyer, params) do
     with {:ok, name} when is_binary(name) <- Map.fetch(params, "name"),
-         :invalid_name <- Buyers.exists?(name) do
+         :invalid_name <- exists?(name) do
       Map.put(buyer, :name, name)
     else
       :invalid_name ->
