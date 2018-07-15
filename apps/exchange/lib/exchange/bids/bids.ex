@@ -19,6 +19,9 @@ defmodule Exchange.Bids do
       :invalid_id ->
         {:error, :invalid_id}
 
+      :error ->
+        {:error, "Bid ID must be present"}
+
       error ->
         {:error, error}
     end
