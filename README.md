@@ -1,22 +1,30 @@
-# Subastas
+# Subastas - IASC 2018
 
-Grupo:
+## Integrantes:
 
 - Matias Mangiantini
 - Juan Bono
+- Kevin Mormandi
 
-[Trabajo Practico](https://docs.google.com/document/d/19LNOQ6UVRD1bX99NxAA7DfSlM4BvavbCQtwrhkj7U8c/edit) de Implementación de Arquitecturas Concurrentes de Software.
+[Trabajo Practico](https://docs.google.com/document/d/19LNOQ6UVRD1bX99NxAA7DfSlM4BvavbCQtwrhkj7U8c/edit) de la materia Implementación de Arquitecturas Concurrentes de Software.
 
-El trabajo esta pensado como una [umbrella application](https://medium.com/matic-insurance/designing-scalable-application-with-elixir-from-umbrella-project-to-distributed-system-42f28c7e62f1) en Elixir que consta con las siguientes aplicaciones hijas:
+## Partes del sistema:
 
-- **Exchange**: Aqui es donde los vendedores y compradores se reunen. Es quien mantiene las subastas y avisa a todos los posibles compradores de nuevas subastas.
-- **TODO**
-- **TODO**
+### Exchange
+Es la interfaz del sistema con los compradores, se encarga de recibir:
+  - Las solicitudes de registro de los compradores.
+  - Las apuestas.
+  - Las ofertas sobre apuestas existentes.
+Para luego redirigirlas a los sistemas internos para su procesamiento.
 
-# Diseño:
+### Buyers
+Sistema interno que se encarga de mantener el estado de los compradores. 
 
-TODO
+### Bids
+Sistema interno que se encarga de mantener el estado de las apuestas, validar las ofertas, etc.
+
+### Client
+Cliente de prueba que simula un cliente real.
 
 ## Deployment:
-
 TODO
