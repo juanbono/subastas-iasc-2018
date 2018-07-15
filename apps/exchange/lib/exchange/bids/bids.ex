@@ -31,7 +31,7 @@ defmodule Exchange.Bids do
 
   def apply(%Offer{} = offer) do
     updated_bid = Bids.Worker.update(offer)
-    Buyers.notify_buyers(:new, updated_bid)
+    Buyers.notify_buyers(:update, updated_bid)
 
     {:ok, updated_bid}
   end

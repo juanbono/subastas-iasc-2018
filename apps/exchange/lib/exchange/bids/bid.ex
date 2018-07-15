@@ -10,7 +10,8 @@ defmodule Exchange.Bids.Bid do
             json: nil,
             tags: nil,
             interested_buyers: nil,
-            winner: nil
+            winner: nil,
+            state: nil
 
   @doc """
   Smart constructor para las apuestas.
@@ -35,7 +36,8 @@ defmodule Exchange.Bids.Bid do
       close_at: nil,
       json: nil,
       tags: nil,
-      interested_buyers: nil
+      interested_buyers: nil,
+      state: "new"
     }
 
   def to_map(bid) do
@@ -45,7 +47,8 @@ defmodule Exchange.Bids.Bid do
       price: bid.price,
       tags: bid.tags,
       winner: bid.winner,
-      close_at: bid.close_at
+      close_at: bid.close_at,
+      state: bid.state
     }
   end
 
@@ -53,7 +56,7 @@ defmodule Exchange.Bids.Bid do
 
   defp check_price(bid, params) do
     case Map.fetch(params, "price") do
-      {:ok, price} when price >= 0 ->
+      {:ok, price} when is_number(price) and(price >= 0) ->
         Map.put(bid, :price, price)
 
       :error ->
@@ -69,7 +72,7 @@ defmodule Exchange.Bids.Bid do
   defp check_close_at(bid, params) do
     now_to_unix = DateTime.to_unix(DateTime.utc_now()) + 5
 
-    with {:ok, close_at} when close_at > now_to_unix <- Map.fetch(params, "close_at"),
+    with {:ok, close_at} when is_integer(close_at) and (close_at > now_to_unix) <- Map.fetch(params, "close_at"),
          {:ok, close_at_date} <- DateTime.from_unix(close_at) do
       Map.put(bid, :close_at, close_at_date)
     else
@@ -84,7 +87,7 @@ defmodule Exchange.Bids.Bid do
   defp check_json({:error, _reason} = err, _params), do: err
 
   defp check_json(bid, params) do
-    with {:ok, json} <- Map.fetch(params, "json") do
+    with {:ok, json} when is_map(json) <- Map.fetch(params, "json") do
       Map.put(bid, :json, json)
     else
       :error ->

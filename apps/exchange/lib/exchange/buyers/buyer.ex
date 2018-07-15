@@ -51,10 +51,6 @@ defmodule Exchange.Buyers.Buyer do
 
       :error ->
         {:error, "Name must be present"}
-
-      # podemos manejar aca el caso en el que el server no tiene espacio?
-      _error ->
-        {:error, "Name is not present"}
     end
   end
 

@@ -77,24 +77,27 @@ defmodule Exchange.Bids.Worker do
       json: state.json,
       tags: state.tags,
       interested_buyers: MapSet.put(state.interested_buyers, offer.buyer),
-      winner: offer.buyer
+      winner: offer.buyer,
+      state: "update"
     }
 
     {:reply, new_state, new_state}
   end
 
   def handle_cast({:cancel}, state) do
-    Buyers.notify_buyers(:cancelled, state)
+    Buyers.notify_buyers(:cancelled, %{state | state: "cancelled"})
+
     Process.exit(self(), :normal)
   end
 
-  def handle_info(:timeout, state) do
-    Buyers.notify_buyers(:finalized, state)
+  def handle_info(:finalize, state) do
+    Buyers.notify_buyers(:finalized, %{state | state: "finalized"})
+
     Process.exit(self(), :normal)
   end
 
   def schedule_timeout(bid) do
     duration = DateTime.diff(bid.close_at, DateTime.utc_now) * 1000
-    Process.send_after(self(), :timeout, duration)
+    Process.send_after(self(), :finalize, duration)
   end
 end

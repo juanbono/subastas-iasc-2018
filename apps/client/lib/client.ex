@@ -24,6 +24,7 @@ defmodule Client do
 
   def handle_close(bid_data) do
     IO.inspect(bid_data, label: "Apuesta terminada")
+    IO.inspect(bid_data["state"], label: "Estado")
     IO.inspect(bid_data["winner"], label: "Ganador")
   end
 
