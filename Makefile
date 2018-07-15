@@ -4,10 +4,10 @@ help:
 	@echo "Comandos:"
 	@echo "- 'make run': levanta el sistema completo."
 	@echo "- 'make deps': instala las dependencias de cada app."
-	@echo "- 'make test': corre los tests de todas las aplicaciones.
-	@echo "- 'make start_exchange': levanta una instancia de la exchange en el puerto 4000.
-	@echo "- 'make start_client1': levanta un cliente en el puerto 5001.
-	@echo "- 'make start_client2: levanta un cliente en el puerto 5002.
+	@echo "- 'make test': corre los tests de todas las aplicaciones."
+	@echo "- 'make start_exchange': levanta una instancia de la exchange en el puerto 4000."
+	@echo "- 'make start_client1': levanta un cliente en el puerto 5001."
+	@echo "- 'make start_client2: levanta un cliente en el puerto 5002."
 
 run: 
 	iex -S mix 
