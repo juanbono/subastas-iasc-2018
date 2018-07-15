@@ -3,7 +3,7 @@ defmodule Exchange.Bids.Worker do
   Cada `Exchange.Bids.Worker` mantiene el estado de una `apuesta` especifica.
   Debe destruirse luego de pasado el tiempo especificado en la `apuesta`.
   """
-  use GenServer
+  use GenServer, restart: :transient
   alias Exchange.{Bids, Bids.Bid, Bids.Offer, Buyers}
 
   #######################
@@ -29,12 +29,14 @@ defmodule Exchange.Bids.Worker do
     GenServer.call(bid_pid, {:update, offer})
   end
 
-  def child_spec(opts) do
-    %{
-      id: __MODULE__,
-      start: {__MODULE__, :start_link, [opts]},
-      restart: :transient
-    }
+  @doc """
+  Cancela una `apuesta`.
+  """
+  def cancel(bid_id) do
+    bid_pid = Bids.get_bid_pid(bid_id)
+    GenServer.cast(bid_pid, {:cancel})
+
+    {:ok}
   end
 
   ########################
@@ -75,19 +77,27 @@ defmodule Exchange.Bids.Worker do
       json: state.json,
       tags: state.tags,
       interested_buyers: MapSet.put(state.interested_buyers, offer.buyer),
-      winner: offer.buyer
+      winner: offer.buyer,
+      state: "update"
     }
 
     {:reply, new_state, new_state}
   end
 
-  def handle_info(:timeout, state) do
-    Buyers.notify_buyers(:termination, state)
+  def handle_cast({:cancel}, state) do
+    Buyers.notify_buyers(:cancelled, %{state | state: "cancelled"})
+
+    Process.exit(self(), :normal)
+  end
+
+  def handle_info(:finalize, state) do
+    Buyers.notify_buyers(:finalized, %{state | state: "finalized"})
+
     Process.exit(self(), :normal)
   end
 
   def schedule_timeout(bid) do
     duration = DateTime.diff(bid.close_at, DateTime.utc_now) * 1000
-    Process.send_after(self(), :timeout, duration)
+    Process.send_after(self(), :finalize, duration)
   end
 end
