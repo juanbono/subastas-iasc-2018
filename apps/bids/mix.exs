@@ -11,19 +11,25 @@ defmodule Bids.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :cowboy, :plug, :httpoison, :confex],
       mod: {Bids.Application, []}
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
+      {:cowboy, "~> 2.4.0"},
+      {:plug, "~> 1.5.1"},
+      {:poison, "~> 3.1"},
+      {:httpoison, "~> 1.2.0"},
+      {:amnesia, "~> 0.2.7"},
+      {:libcluster, "~> 3.0.2"},
+      {:swarm, "~> 3.3.1"},
+      {:elixir_uuid, "~> 1.2"},
+      {:unsplit, git: "https://github.com/discordapp/unsplit"},
+      {:confex, "~> 3.3.1"}
     ]
   end
 end

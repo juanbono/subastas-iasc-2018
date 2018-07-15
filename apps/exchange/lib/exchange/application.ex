@@ -1,8 +1,4 @@
 defmodule Exchange.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
-  @moduledoc false
-
   use Application
 
   def start(_type, _args) do
@@ -21,7 +17,6 @@ defmodule Exchange.Application do
     bids_supervisor_spec =
       {DynamicSupervisor, name: Exchange.Bids.Supervisor, strategy: :one_for_one}
 
-    # List all child processes to be supervised
     children = [
       plug_spec,
       Supervisor.child_spec(buyers_supervisor_spec, id: :buyers_supervisor),
