@@ -9,7 +9,7 @@ defmodule Exchange.MixProject do
       config_path: "./config/config.exs",
       deps_path: "./deps",
       lockfile: "./mix.lock",
-      elixir: "~> 1.6",
+      elixir: "~> 1.6.6",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -32,7 +32,6 @@ defmodule Exchange.MixProject do
       {:httpoison, "~> 1.2.0"},
       {:amnesia, "~> 0.2.7"},
       {:elixir_uuid, "~> 1.2"},
-      {:unsplit, git: "https://github.com/discordapp/unsplit"},
       {:confex, "~> 3.3.1"},
       {:distillery, "~> 1.5.3", runtime: false}
     ]
