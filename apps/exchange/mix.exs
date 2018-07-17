@@ -1,16 +1,19 @@
 defmodule Exchange.MixProject do
   use Mix.Project
 
+  @version System.get_env("APP_VERSION") || "0.0.0"
+
   def project do
     [
       app: :exchange,
-      version: "0.1.0",
+      version: @version,
       build_path: "./_build",
       config_path: "./config/config.exs",
       deps_path: "./deps",
       lockfile: "./mix.lock",
       elixir: "~> 1.6.6",
-      start_permanent: Mix.env() == :prod,
+      # :prod
+      start_permanent: Mix.env() == :docker,
       deps: deps()
     ]
   end

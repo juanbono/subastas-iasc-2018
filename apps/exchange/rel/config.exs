@@ -38,6 +38,17 @@ environment :prod do
   set(cookie: :"vY!Ue5``HokN3.<p|66ZC(nU%DHIp^C}=G:L6zAT:[o!{RgAzl5>._Doe=^o9D//")
 end
 
+environment :docker do
+  set(dev_mode: false)
+  set(include_erts: true)
+  set(include_src: false)
+
+  set(
+    cookie:
+      :crypto.hash(:sha256, :crypto.strong_rand_bytes(25)) |> Base.encode16() |> String.to_atom()
+  )
+end
+
 # You may define one or more releases in this file.
 # If you have not set a default release, or selected one
 # when running `mix release`, the first release in the file

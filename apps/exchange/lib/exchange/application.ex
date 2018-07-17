@@ -5,8 +5,9 @@ defmodule Exchange.Application do
     # port = Application.fetch_env!(:exchange, :port)
     port =
       "PORT"
-      |> System.get_env()
-      |> String.to_integer()
+      |> System.get_env() ||
+        "4000"
+        |> String.to_integer()
 
     plug_spec =
       Plug.Adapters.Cowboy2.child_spec(
