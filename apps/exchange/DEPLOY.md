@@ -38,3 +38,19 @@ $ kubectl get pods
 ```
 $ minikube dashboard --logtostderr --v=2
 ```
+
+
+
+## Crear un registry local y pullear la imagen desde ahi
+```
+$ docker run -d -p 5000:5000 --restart=always --name registry registry:2
+$ docker build -t localhost:5000/exchange:release .
+$ docker push localhost:5000/exchange
+$ docker pull localhost:5000/exchange:release
+```
+
+## Crear un tarball con la imagen
+```
+$ docker save exchange > exchange.tar
+$ docker image load -i exchange.tar
+```
