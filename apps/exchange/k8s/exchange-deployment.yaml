@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: exchange-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: exchange
+    spec:
+      containers:
+        - name: exchange
+          image: exchange:release
+          ports:
+            - containerPort: 4000
+          args: ["foreground"]
+          env:
+            - name: PORT
+              value: "4000"
+
