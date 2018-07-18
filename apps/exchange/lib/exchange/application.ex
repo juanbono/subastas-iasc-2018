@@ -3,11 +3,8 @@ defmodule Exchange.Application do
 
   def start(_type, _args) do
     # port = Application.fetch_env!(:exchange, :port)
-    port =
-      "PORT"
-      |> System.get_env() ||
-        "4000"
-        |> String.to_integer()
+    port_from_env = System.get_env("PORT") || "4000"
+    port = String.to_integer(port_from_env)
 
     plug_spec =
       Plug.Adapters.Cowboy2.child_spec(

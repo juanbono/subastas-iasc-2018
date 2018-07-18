@@ -49,7 +49,7 @@ defmodule Exchange.Buyers.Buyer do
       :invalid_name ->
         {:error, :invalid_name}
 
-      :error ->
+      _error ->
         {:error, "Name must be present"}
     end
   end

@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         - name: exchange
-          image: localhost:5000/exchange:release
+          image: exchange:release
           ports:
             - containerPort: 4000
           args: ["foreground"]
