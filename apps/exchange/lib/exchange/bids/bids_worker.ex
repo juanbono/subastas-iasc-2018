@@ -50,7 +50,7 @@ defmodule Exchange.Bids.Worker do
   def init(%Bid{} = bid) do
     new_bid =
       bid
-      |> Map.put(:bid_id, UUID.uuid1())
+      |> Map.put(:bid_id, UUID.uuid4(:hex))
       |> Map.put(:interested_buyers, MapSet.new())
 
     schedule_timeout(bid)
