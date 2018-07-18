@@ -34,6 +34,8 @@ defmodule Exchange.MixProject do
       {:poison, "~> 3.1"},
       {:httpoison, "~> 1.2.0"},
       {:amnesia, "~> 0.2.7"},
+      {:libcluster, "~> 3.0.2"},
+      {:swarm, "~> 3.3.1"},
       {:elixir_uuid, "~> 1.2"},
       {:confex, "~> 3.3.1"},
       {:distillery, "~> 1.5.3", runtime: false}
