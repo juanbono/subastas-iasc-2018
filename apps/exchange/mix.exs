@@ -1,16 +1,19 @@
 defmodule Exchange.MixProject do
   use Mix.Project
 
+  @version System.get_env("APP_VERSION") || "0.0.0"
+
   def project do
     [
       app: :exchange,
-      version: "0.1.0",
+      version: @version,
       build_path: "./_build",
       config_path: "./config/config.exs",
       deps_path: "./deps",
       lockfile: "./mix.lock",
-      elixir: "~> 1.6",
-      start_permanent: Mix.env() == :prod,
+      elixir: "~> 1.6.6",
+      # :prod
+      start_permanent: Mix.env() == :docker,
       deps: deps()
     ]
   end
@@ -18,7 +21,7 @@ defmodule Exchange.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :cowboy, :plug, :httpoison, :confex],
+      extra_applications: [:logger, :cowboy, :plug, :httpoison, :confex, :parse_trans],
       mod: {Exchange.Application, []}
     ]
   end
@@ -32,8 +35,8 @@ defmodule Exchange.MixProject do
       {:httpoison, "~> 1.2.0"},
       {:amnesia, "~> 0.2.7"},
       {:elixir_uuid, "~> 1.2"},
-      {:unsplit, git: "https://github.com/discordapp/unsplit"},
-      {:confex, "~> 3.3.1"}
+      {:confex, "~> 3.3.1"},
+      {:distillery, "~> 1.5.3", runtime: false}
     ]
   end
 end

@@ -12,7 +12,7 @@ defmodule Exchange.Buyers do
   @doc """
   Registra un comprador en el sistema. En caso de recibir un error, lo devuelve.
   """
-  def register(%Buyer{} = buyer) do
+  def register(buyer) do
     with {:ok, _pid} <- Buyers.Supervisor.register(buyer) do
       {:ok, number_of_buyers()}
     else
