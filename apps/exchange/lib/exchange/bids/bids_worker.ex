@@ -4,6 +4,7 @@ defmodule Exchange.Bids.Worker do
   Debe destruirse luego de pasado el tiempo especificado en la `apuesta`.
   """
   use GenServer, restart: :transient
+  require Logger
   alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
 
   #######################
@@ -94,6 +95,10 @@ defmodule Exchange.Bids.Worker do
     Buyers.Local.notify_buyers(:finalized, %{state | state: "finalized"})
 
     Process.exit(self(), :normal)
+  end
+
+  def handle_info(msg, _state) do
+    Logger.info("Received unknown message: #{inspect(msg)}")
   end
 
   def schedule_timeout(bid) do
