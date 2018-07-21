@@ -16,7 +16,7 @@ curl -H "Content-Type: application/json" \
 ##########################################
 
 curl -H "Content-Type: application/json" \
-     -d '{"tags":["zapatos"], "price": 2.0, "duration": 20000, "json": {"id": 12, "name": "mimisho"}}' \
+     -d '{"tags":["zapatos"], "price": 2.0, "close_at": <Reemplazar>, "json": {"id": 12, "name": "mimisho"}}' \
      http://localhost:4000/bids
 
 # request para probar actualizacion de bids

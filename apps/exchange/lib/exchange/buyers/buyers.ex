@@ -1,11 +1,15 @@
 defmodule Exchange.Buyers do
+  @moduledoc """
+  Modulo interfaz de los compradores. Explicar
+  """
   alias Exchange.{Buyers, Buyers.Buyer}
 
   @doc """
   Valida los datos dados y registra a un nuevo `comprador` con ellos.
   """
   def process(params) do
-    Buyer.make(params)
+    params
+    |> Buyer.make()
     |> register()
   end
 
@@ -13,11 +17,14 @@ defmodule Exchange.Buyers do
   Registra un comprador en el sistema. En caso de recibir un error, lo devuelve.
   """
   def register(buyer) do
-    with {:ok, _pid} <- Buyers.Supervisor.register(buyer) do
+    with {:ok, _pid} <- Exchange.Registry.start_buyer(buyer) do
       {:ok, number_of_buyers()}
     else
-      error ->
-        error
+      {:error, _reason} = err ->
+        err
+
+      reason ->
+        {:error, reason}
     end
   end
 

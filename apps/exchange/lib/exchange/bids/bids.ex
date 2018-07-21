@@ -1,13 +1,18 @@
 defmodule Exchange.Bids do
+  @moduledoc """
+  Modulo interfaz de las apuestas. Explicar
+  """
   alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
 
   def process(:bid, params) do
-    Bid.make(params)
+    params
+    |> Bid.make()
     |> register()
   end
 
   def process(:offer, params) do
-    Offer.make(params)
+    params
+    |> Offer.make()
     |> apply()
   end
 
@@ -42,20 +47,23 @@ defmodule Exchange.Bids do
   @doc """
   Registra una apuesta en el sistema.
   """
-  def register(%Bid{} = bid) do
-    with {:ok, bid_state} <- Bids.Supervisor.register(bid) do
+  def register(bid) do
+    with {:ok, bid_state} <- Exchange.Registry.start_bid(bid) do
       Buyers.Local.notify_buyers(:new, bid_state)
       {:ok, bid_state}
     else
-      error ->
-        error
+      {:error, _reason} = err ->
+        err
+
+      reason ->
+        {:error, reason}
     end
   end
 
   @doc """
   Devuelve una lista con los PIDs de las `apuestas` en el sistema.
   """
-  defdelegate current_bids, to: Bids.Supervisor
+  defdelegate current_bids, to: Bids.Supervisor, as: :get_bids
 
   @doc """
   Cantidad de `apuestas` en el sistema.
