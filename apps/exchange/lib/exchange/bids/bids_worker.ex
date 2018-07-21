@@ -59,7 +59,7 @@ defmodule Exchange.Bids.Worker do
   end
 
   def start_link(bid_data) do
-    GenServer.start_link(__MODULE__, bid_data, debug: [:statistics, :trace])
+    GenServer.start_link(__MODULE__, bid_data)
   end
 
   def handle_call({:get_bid_id}, _from, %{bid_id: bid_id} = state) do

@@ -2,15 +2,23 @@ defmodule Exchange.Bids.SwarmSupervisor do
   @moduledoc """
   Supervisor de las apuestas. Explicar
   """
-  alias Exchange.{Bids, Bids.Bid}
+  alias Exchange.Bids.Bid
 
   @doc """
   Crea la `apuesta` en el cluster y registra su `id`,
   luego lo une al grupo `:bids.
   """
   def start_bid(%Bid{bid_id: id} = bid) do
-    {:ok, pid} = Swarm.register_name(id, Bids.Supervisor, :register, [bid])
-    Swarm.join(:bids, pid)
+    with {:ok, pid} <- Swarm.register_name(id, __MODULE__, :register, [bid]),
+         :ok <- Swarm.join(:bids, pid) do
+      {:ok, bid}
+    else
+      {:error, _reason} = err ->
+        err
+
+      reason ->
+        {:error, reason}
+    end
   end
 
   @doc """
@@ -21,5 +29,7 @@ defmodule Exchange.Bids.SwarmSupervisor do
   @doc """
   Obtiene el `pid` de cada una de las `apuestas`.
   """
-  def get_bids(), do: Swarm.members(:bids)
+  def get_bids, do: Swarm.members(:bids)
+
+  def number_of_bids, do: get_bids() |> Enum.count()
 end

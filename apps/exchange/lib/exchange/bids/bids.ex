@@ -48,7 +48,7 @@ defmodule Exchange.Bids do
   Registra una apuesta en el sistema.
   """
   def register(%Bid{} = bid) do
-    with {:ok, bid_state} <- Bids.Supervisor.register(bid) do
+    with {:ok, bid_state} <- Bids.SwarmSupervisor.start_bid(bid) do
       Buyers.Local.notify_buyers(:new, bid_state)
       {:ok, bid_state}
     else
@@ -60,12 +60,12 @@ defmodule Exchange.Bids do
   @doc """
   Devuelve una lista con los PIDs de las `apuestas` en el sistema.
   """
-  defdelegate current_bids, to: Bids.Supervisor
+  defdelegate current_bids, to: Bids.SwarmSupervisor, as: :get_bids
 
   @doc """
   Cantidad de `apuestas` en el sistema.
   """
-  defdelegate number_of_bids, to: Bids.Supervisor
+  defdelegate number_of_bids, to: Bids.SwarmSupervisor
 
   @doc """
   Devuelve los datos de la `apuesta` con el `id` dado.
