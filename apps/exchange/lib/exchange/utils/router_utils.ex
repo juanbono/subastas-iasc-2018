@@ -44,7 +44,7 @@ defmodule Exchange.Utils.Router do
 
   def handle_response(result, :cancel_offer_endpoint, conn) do
     case result do
-      {:ok} ->
+      :ok ->
         send_json_message(conn, :ok, "Bid cancelled succesfully!")
 
       {:error, reason} ->
