@@ -103,9 +103,10 @@ defmodule Exchange.Buyers.Worker do
   defp make_body(bid), do: Poison.encode!(encode_bid(bid))
 
   defp send_request(body, url) do
-    res = HTTPoison.post!(url, body, [{"content-type", "application/json"}])
-
-    Logger.info("Response Body: #{inspect(res.body)}")
+    case HTTPoison.post(url, body, [{"content-type", "application/json"}]) do
+      {:ok, res} -> Logger.info(inspect(res))
+      {:error, reason} -> Logger.warn(inspect(reason))
+    end
   end
 
   defp has_tags_in_common?(bid_tags, buyer_tags) do
