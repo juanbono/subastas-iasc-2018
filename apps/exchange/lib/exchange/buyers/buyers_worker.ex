@@ -11,122 +11,96 @@ defmodule Exchange.Buyers.Worker do
   #######################
 
   @doc """
+  Inicializa el Worker con los datos del `comprador` como estado.
+  """
+  def init([%Buyer{} = buyer]), do: {:ok, buyer}
+
+  def start_link(buyer), do: GenServer.start_link(__MODULE__, [buyer])
+
+  @doc """
   Devuelve el nombre del `comprador` con el `pid` dado.
   """
-  def name(buyer_pid) do
-    GenServer.call(buyer_pid, {:get_name})
-  end
+  def name(pid), do: GenServer.call(pid, {:get_name})
 
   @doc """
   Notifica al comprador con el `pid` dado sobre la creacion de
   una `apuesta`.
   """
-  def notify_new(pid, bid) do
-    GenServer.cast(pid, {:bid_new, bid})
-  end
+  def notify_new(pid, bid), do: GenServer.cast(pid, {:bid_new, bid})
 
   @doc """
   Notifica al comprador con el `pid` dado sobre
   la actualización de una `apuesta`.
   """
-  def notify_update(pid, bid) do
-    GenServer.cast(pid, {:bid_updated, bid})
-  end
+  def notify_update(pid, bid), do: GenServer.cast(pid, {:bid_updated, bid})
 
   @doc """
   Notifica al comprador con el `pid` dado sobre
   la cancelación de una `apuesta`.
   """
-  def notify_cancelled(pid, bid) do
-    GenServer.cast(pid, {:bid_cancelled, bid})
-  end
+  def notify_cancelled(pid, bid), do: GenServer.cast(pid, {:bid_cancelled, bid})
 
   @doc """
   Notifica al comprador con el `pid` dado sobre
   la finalización de una `apuesta`.
   """
-  def notify_finalized(pid, bid) do
-    GenServer.cast(pid, {:bid_finalized, bid})
-  end
+  def notify_finalized(pid, bid), do: GenServer.cast(pid, {:bid_finalized, bid})
 
   @doc """
   Verifica si el nombre del `comprador` se encuentra dentro
   de la lista de compradores dada.
   """
-  def in?(pid, buyers_list) do
-    GenServer.call(pid, {:name_is_in, buyers_list})
-  end
+  def in?(pid, buyers_list), do: GenServer.call(pid, {:name_is_in, buyers_list})
 
   ########################
   ## Funciones Servidor ##
   ########################
 
-  @doc """
-  Inicializa el Worker con los datos del `comprador` como estado.
-  """
-  def init(%Buyer{} = buyer) do
-    IO.inspect("INIT")
-    {:ok, buyer}
-  end
-
-  def start_link(buyer_data) do
-    IO.inspect("START")
-    GenServer.start_link(__MODULE__, buyer_data)
-  end
-
   def handle_cast({:bid_new, bid}, %Buyer{ip: ip, tags: tags} = state) do
     if has_tags_in_common?(bid.tags, tags) do
       body = make_body(bid)
-      url = ip <> "/bids/open"
 
-      spawn(fn -> send_request(body, url) end)
+      spawn(fn -> send_request(body, "#{ip}/bids/open") end)
     end
 
     {:noreply, state}
   end
 
   def handle_cast({:bid_updated, bid}, %Buyer{ip: ip} = state) do
-    body = make_body(bid)
-    url = ip <> "/bids/new_offer"
-
-    send_request(body, url)
+    bid
+    |> make_body()
+    |> send_request("#{ip}/bids/new_offer")
 
     {:noreply, state}
   end
 
   def handle_cast({:bid_cancelled, bid}, %Buyer{ip: ip} = state) do
-    body = make_body(bid)
-    url = ip <> "/bids/close"
-
-    send_request(body, url)
+    bid
+    |> make_body()
+    |> send_request("#{ip}/bids/close")
 
     {:noreply, state}
   end
 
   def handle_cast({:bid_finalized, bid}, %Buyer{ip: ip} = state) do
-    body = make_body(bid)
-    url = ip <> "/bids/close"
-
-    send_request(body, url)
+    bid
+    |> make_body()
+    |> send_request("#{ip}/bids/close")
 
     {:noreply, state}
   end
 
-  def handle_call({:get_name}, _from, %Buyer{name: name} = state) do
-    {:reply, name, state}
-  end
+  def handle_call({:get_name}, _from, %Buyer{name: name} = state),
+    do: {:reply, name, state}
 
-  def handle_call({:name_is_in, list}, _from, %Buyer{name: name} = state) do
-    {:reply, Enum.member?(list, name), state}
-  end
+  def handle_call({:name_is_in, list}, _from, %Buyer{name: name} = state),
+    do: {:reply, Enum.member?(list, name), state}
 
   ##########################
   ## Funciones Auxiliares ##
   ##########################
 
-  defp make_body(bid) do
-    Poison.encode!(encode_bid(bid))
-  end
+  defp make_body(bid), do: Poison.encode!(encode_bid(bid))
 
   defp send_request(body, url) do
     res = HTTPoison.post!(url, body, [{"content-type", "application/json"}])

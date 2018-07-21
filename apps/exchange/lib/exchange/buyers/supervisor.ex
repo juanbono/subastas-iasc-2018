@@ -11,7 +11,7 @@ defmodule Exchange.Buyers.SwarmSupervisor do
 
   def init(_) do
     children = [
-      worker(Buyers.Worker, [], restart: :temporary)
+      worker(Exchange.Buyers.Worker, [], restart: :temporary)
     ]
 
     supervise(children, strategy: :simple_one_for_one)
@@ -23,14 +23,18 @@ defmodule Exchange.Buyers.SwarmSupervisor do
   """
   def register({:error, _} = error), do: error
 
-  def register(%Buyer{name: name} = buyer) do
+  def register(buyer) do
+    {:ok, _pid} = Supervisor.start_child(__MODULE__, [buyer])
+  end
+
+  def start_buyer({:error, _} = error), do: error
+
+  def start_buyer(%Buyer{name: name} = buyer) do
     with {:ok, pid} <- Swarm.register_name(name, __MODULE__, :register, [buyer], 2000),
          :ok <- Swarm.join(:buyers, pid) do
-      IO.inspect("OK")
       {:ok, pid}
     else
       {:error, _reason} = err ->
-        IO.inspect("ERR")
         err
     end
   end

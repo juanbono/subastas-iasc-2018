@@ -17,7 +17,7 @@ defmodule Exchange.Buyers do
   Registra un comprador en el sistema. En caso de recibir un error, lo devuelve.
   """
   def register(buyer) do
-    with {:ok, _pid} <- Buyers.SwarmSupervisor.register(buyer) do
+    with {:ok, _pid} <- Exchange.Registry.start_buyer(buyer) do
       {:ok, number_of_buyers()}
     else
       error ->
