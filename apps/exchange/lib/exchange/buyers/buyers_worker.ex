@@ -65,10 +65,12 @@ defmodule Exchange.Buyers.Worker do
   Inicializa el Worker con los datos del `comprador` como estado.
   """
   def init(%Buyer{} = buyer) do
+    IO.inspect("INIT")
     {:ok, buyer}
   end
 
   def start_link(buyer_data) do
+    IO.inspect("START")
     GenServer.start_link(__MODULE__, buyer_data)
   end
 

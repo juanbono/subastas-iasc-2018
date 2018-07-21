@@ -3,6 +3,7 @@ defmodule Exchange.Application do
   Modulo Aplicacion de la Exchange. Explicar
   """
   use Application
+  import Supervisor.Spec
 
   def start(_type, _args) do
     # port = Application.fetch_env!(:exchange, :port)
@@ -24,8 +25,10 @@ defmodule Exchange.Application do
 
     children = [
       plug_spec,
-      Supervisor.child_spec(buyers_supervisor_spec, id: :buyers_supervisor),
-      Supervisor.child_spec(bids_supervisor_spec, id: :bids_supervisor)
+      supervisor(Exchange.Bids.SwarmSupervisor, []),
+      supervisor(Exchange.Buyers.SwarmSupervisor, [])
+      # Supervisor.child_spec(buyers_supervisor_spec, id: :buyers_supervisor),
+      # Supervisor.child_spec(bids_supervisor_spec, id: :bids_supervisor)
     ]
 
     opts = [strategy: :one_for_one, name: Exchange.Supervisor]

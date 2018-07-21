@@ -21,7 +21,16 @@ defmodule Exchange.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :cowboy, :plug, :httpoison, :confex, :parse_trans],
+      extra_applications: [
+        :logger,
+        :cowboy,
+        :plug,
+        :httpoison,
+        :confex,
+        :parse_trans,
+        :swarm,
+        :libcluster
+      ],
       mod: {Exchange.Application, []}
     ]
   end

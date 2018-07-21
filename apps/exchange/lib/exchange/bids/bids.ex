@@ -48,12 +48,15 @@ defmodule Exchange.Bids do
   Registra una apuesta en el sistema.
   """
   def register(%Bid{} = bid) do
-    with {:ok, bid_state} <- Bids.SwarmSupervisor.start_bid(bid) do
+    with {:ok, bid_state} <- Bids.SwarmSupervisor.register(bid) do
       Buyers.Local.notify_buyers(:new, bid_state)
       {:ok, bid_state}
     else
-      error ->
-        error
+      {:error, _reason} = err ->
+        err
+
+      reason ->
+        {:error, reason}
     end
   end
 
