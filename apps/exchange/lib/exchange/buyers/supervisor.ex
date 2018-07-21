@@ -1,4 +1,4 @@
-defmodule Exchange.Buyers.SwarmSupervisor do
+defmodule Exchange.Buyers.Supervisor do
   @moduledoc """
   Supervisor de los compradores. Explicar
   """

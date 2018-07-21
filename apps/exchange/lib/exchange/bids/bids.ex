@@ -63,12 +63,12 @@ defmodule Exchange.Bids do
   @doc """
   Devuelve una lista con los PIDs de las `apuestas` en el sistema.
   """
-  defdelegate current_bids, to: Bids.SwarmSupervisor, as: :get_bids
+  defdelegate current_bids, to: Bids.Supervisor, as: :get_bids
 
   @doc """
   Cantidad de `apuestas` en el sistema.
   """
-  defdelegate number_of_bids, to: Bids.SwarmSupervisor
+  defdelegate number_of_bids, to: Bids.Supervisor
 
   @doc """
   Devuelve los datos de la `apuesta` con el `id` dado.

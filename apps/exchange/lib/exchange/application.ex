@@ -19,8 +19,8 @@ defmodule Exchange.Application do
 
     children = [
       plug_spec,
-      supervisor(Exchange.Bids.SwarmSupervisor, []),
-      supervisor(Exchange.Buyers.SwarmSupervisor, [])
+      supervisor(Exchange.Bids.Supervisor, []),
+      supervisor(Exchange.Buyers.Supervisor, [])
     ]
 
     opts = [strategy: :one_for_one, name: Exchange.Supervisor]

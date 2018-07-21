@@ -29,40 +29,36 @@ defmodule Exchange.Buyers do
   end
 
   def notify_buyers(:new, bid) do
-    # Buyers.Supervisor.current_buyers()
-    Buyers.SwarmSupervisor.current_buyers()
+    Buyers.Supervisor.current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify_new(pid, bid) end)
   end
 
   def notify_buyers(:update, bid) do
-    # Buyers.Supervisor.current_buyers()
-    Buyers.SwarmSupervisor.current_buyers()
+    Buyers.Supervisor.current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify_update(pid, bid) end)
   end
 
   def notify_buyers(:cancelled, bid) do
-    # Buyers.Supervisor.current_buyers()
-    Buyers.SwarmSupervisor.current_buyers()
+    Buyers.Supervisor.current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify_cancelled(pid, bid) end)
   end
 
   def notify_buyers(:finalized, bid) do
-    # Buyers.Supervisor.current_buyers()
-    Buyers.SwarmSupervisor.current_buyers()
+    Buyers.Supervisor.current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify_finalized(pid, bid) end)
   end
 
   @doc """
   Cantidad de compradores en el sistema.
   """
-  defdelegate number_of_buyers, to: Buyers.SwarmSupervisor
+  defdelegate number_of_buyers, to: Buyers.Supervisor
 
   @doc """
   Comprueba la existencia en el sistema de un `comprador` con nombre `name`.
   """
   def exists?(name) do
     buyers =
-      Buyers.SwarmSupervisor.current_buyers()
+      Buyers.Supervisor.current_buyers()
       |> Enum.map(fn buyer -> Buyers.Worker.name(buyer) end)
 
     if Enum.member?(buyers, name), do: :ok, else: :invalid_name

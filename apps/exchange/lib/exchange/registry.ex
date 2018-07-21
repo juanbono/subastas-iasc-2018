@@ -2,12 +2,12 @@ defmodule Exchange.Registry do
   @moduledoc """
   Registro de la Exchange.
   """
+  alias Exchange.{Buyers, Bids}
 
   def start_buyer({:error, _} = error), do: error
 
   def start_buyer(buyer) do
-    {:ok, pid} =
-      Swarm.register_name(buyer.name, Exchange.Buyers.SwarmSupervisor, :register, [buyer])
+    {:ok, pid} = Swarm.register_name(buyer.name, Buyers.Supervisor, :register, [buyer])
 
     Swarm.join(:buyers, pid)
     {:ok, pid}
@@ -21,13 +21,7 @@ defmodule Exchange.Registry do
 
   def start_bid(bid) do
     with bid2 <- Map.put(bid, :bid_id, UUID.uuid4(:hex)),
-         {:ok, pid} <-
-           Swarm.register_name(
-             bid2.bid_id,
-             Exchange.Bids.SwarmSupervisor,
-             :register,
-             [bid2]
-           ),
+         {:ok, pid} <- Swarm.register_name(bid2.bid_id, Bids.Supervisor, :register, [bid2]),
          :ok <- Swarm.join(:bids, pid) do
       {:ok, bid}
     else
