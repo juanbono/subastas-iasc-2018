@@ -1,11 +1,11 @@
 defmodule Exchange.Bids.Bid do
   @moduledoc """
   Campos:
+  - :bid_id
   - :price
   - :close_at
   - :json
   - :tags
-  - :bid_id
   - :interested_buyers
   """
 
