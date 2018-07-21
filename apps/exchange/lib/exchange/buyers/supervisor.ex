@@ -2,7 +2,6 @@ defmodule Exchange.Buyers.SwarmSupervisor do
   @moduledoc """
   Supervisor de los compradores. Explicar
   """
-  alias Exchange.Buyers.Buyer
   use Supervisor
 
   def start_link() do
@@ -25,18 +24,6 @@ defmodule Exchange.Buyers.SwarmSupervisor do
 
   def register(buyer) do
     {:ok, _pid} = Supervisor.start_child(__MODULE__, [buyer])
-  end
-
-  def start_buyer({:error, _} = error), do: error
-
-  def start_buyer(%Buyer{name: name} = buyer) do
-    with {:ok, pid} <- Swarm.register_name(name, __MODULE__, :register, [buyer], 2000),
-         :ok <- Swarm.join(:buyers, pid) do
-      {:ok, pid}
-    else
-      {:error, _reason} = err ->
-        err
-    end
   end
 
   @doc """

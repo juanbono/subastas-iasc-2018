@@ -20,8 +20,11 @@ defmodule Exchange.Buyers do
     with {:ok, _pid} <- Exchange.Registry.start_buyer(buyer) do
       {:ok, number_of_buyers()}
     else
-      error ->
-        error
+      {:error, _reason} = err ->
+        err
+
+      reason ->
+        {:error, reason}
     end
   end
 

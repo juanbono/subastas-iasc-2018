@@ -2,7 +2,6 @@ defmodule Exchange.Bids.SwarmSupervisor do
   @moduledoc """
   Supervisor de las apuestas. Explicar
   """
-  alias Exchange.Bids.Bid
   use Supervisor
 
   def start_link() do
@@ -11,7 +10,7 @@ defmodule Exchange.Bids.SwarmSupervisor do
 
   def init(_) do
     children = [
-      worker(Bids.Worker, [], restart: :temporary)
+      worker(Exchange.Bids.Worker, [], restart: :temporary)
     ]
 
     supervise(children, strategy: :simple_one_for_one)
@@ -19,21 +18,12 @@ defmodule Exchange.Bids.SwarmSupervisor do
 
   @doc """
   Crea la `apuesta` en el cluster y registra su `id`,
-  luego lo une al grupo `:bids.
+  luego la agrega al grupo `:bids`.
   """
   def register({:error, _} = error), do: error
 
-  def register(%Bid{bid_id: id} = bid) do
-    with {:ok, pid} <- Swarm.register_name(id, __MODULE__, :register, [bid], 2000),
-         :ok <- Swarm.join(:bids, pid) do
-      {:ok, bid}
-    else
-      {:error, _reason} = err ->
-        err
-
-      reason ->
-        {:error, reason}
-    end
+  def register(bid) do
+    {:ok, _pid} = Supervisor.start_child(__MODULE__, [bid])
   end
 
   @doc """
