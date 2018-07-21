@@ -36,6 +36,7 @@ defmodule Exchange.MixProject do
       {:amnesia, "~> 0.2.7"},
       {:libcluster, "~> 3.0.2"},
       {:swarm, "~> 3.3.1"},
+      {:credo, "~> 0.9.3", only: [:dev, :test], runtime: false},
       {:elixir_uuid, "~> 1.2"},
       {:confex, "~> 3.3.1"},
       {:distillery, "~> 1.5.3", runtime: false}

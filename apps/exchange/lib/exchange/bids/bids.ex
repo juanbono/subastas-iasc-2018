@@ -1,13 +1,18 @@
 defmodule Exchange.Bids do
+  @moduledoc """
+  Modulo interfaz de las apuestas. Explicar
+  """
   alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
 
   def process(:bid, params) do
-    Bid.make(params)
+    params
+    |> Bid.make()
     |> register()
   end
 
   def process(:offer, params) do
-    Offer.make(params)
+    params
+    |> Offer.make()
     |> apply()
   end
 

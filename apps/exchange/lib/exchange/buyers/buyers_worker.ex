@@ -1,5 +1,9 @@
 defmodule Exchange.Buyers.Worker do
+  @moduledoc """
+  Worker que representa un comprador. Explicar
+  """
   use GenServer
+  require Logger
   alias Exchange.Buyers.Buyer
 
   #######################
@@ -125,7 +129,7 @@ defmodule Exchange.Buyers.Worker do
   defp send_request(body, url) do
     res = HTTPoison.post!(url, body, [{"content-type", "application/json"}])
 
-    IO.inspect(res.body, label: "#{url} response body")
+    Logger.info("Response Body: #{inspect(res.body)}")
   end
 
   defp has_tags_in_common?(bid_tags, buyer_tags) do

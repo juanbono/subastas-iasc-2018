@@ -1,6 +1,6 @@
 defmodule Exchange.Buyers.Buyer do
   @moduledoc """
-
+  Modelo de un comprador.
   """
   alias Exchange.Buyers
 

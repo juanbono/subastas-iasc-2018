@@ -1,4 +1,7 @@
 defmodule Exchange.Bids.Supervisor do
+  @moduledoc """
+  Supervisor de las apuestas. Deprecado
+  """
   use DynamicSupervisor
 
   alias Exchange.{Bids, Bids.Bid}
@@ -23,7 +26,8 @@ defmodule Exchange.Bids.Supervisor do
   Devuelve una lista con los PIDs de las `apuestas` en el sistema.
   """
   def current_bids() do
-    DynamicSupervisor.which_children(__MODULE__)
+    __MODULE__
+    |> DynamicSupervisor.which_children()
     |> Enum.map(fn {_, pid, _, _} -> pid end)
   end
 

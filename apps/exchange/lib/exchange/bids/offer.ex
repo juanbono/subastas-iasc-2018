@@ -1,6 +1,6 @@
 defmodule Exchange.Bids.Offer do
   @moduledoc """
-
+  Modelo de una oferta.
   """
   alias Exchange.{Bids, Bids.Bid, Bids.Interfaces.Buyers}
 

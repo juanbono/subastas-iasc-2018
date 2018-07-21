@@ -1,4 +1,7 @@
 defmodule Exchange.Application do
+  @moduledoc """
+  Modulo Aplicacion de la Exchange. Explicar
+  """
   use Application
 
   def start(_type, _args) do

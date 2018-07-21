@@ -1,6 +1,12 @@
 defmodule Exchange.Bids.Bid do
   @moduledoc """
-
+  Campos:
+  - :price
+  - :close_at
+  - :json
+  - :tags
+  - :bid_id
+  - :interested_buyers
   """
 
   @enforce_keys [:price, :close_at, :json, :tags, :bid_id, :interested_buyers]

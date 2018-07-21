@@ -1,4 +1,7 @@
 defmodule Exchange.Buyers.Supervisor do
+  @moduledoc """
+  Supervisor de los compradores. Deprecado
+  """
   use DynamicSupervisor
 
   alias Exchange.{Buyers, Buyers.Buyer}
@@ -20,7 +23,8 @@ defmodule Exchange.Buyers.Supervisor do
   Devuelve una lista con los PIDs de los compradores en el sistema.
   """
   def current_buyers() do
-    DynamicSupervisor.which_children(__MODULE__)
+    __MODULE__
+    |> DynamicSupervisor.which_children()
     |> Enum.map(fn {_, pid, _, _} -> pid end)
   end
 
@@ -29,10 +33,5 @@ defmodule Exchange.Buyers.Supervisor do
   """
   def number_of_buyers() do
     DynamicSupervisor.count_children(__MODULE__).workers
-  end
-
-  def names_to_pids(buyer_names) do
-    current_buyers()
-    |> Enum.filter(fn pid -> Buyers.Worker.in?(pid, buyer_names) end)
   end
 end
