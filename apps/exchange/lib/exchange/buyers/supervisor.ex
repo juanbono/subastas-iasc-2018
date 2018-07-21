@@ -10,7 +10,7 @@ defmodule Exchange.Buyers.Supervisor do
 
   def init(_) do
     children = [
-      worker(Exchange.Buyers.Worker, [], restart: :temporary)
+      worker(Exchange.Buyers.Worker, [], restart: :transient)
     ]
 
     supervise(children, strategy: :simple_one_for_one)
