@@ -1,7 +1,7 @@
 defmodule Exchange.Interfaces.Buyers.Local do
   @moduledoc """
-  Modulo con las funciones de los compradores que son utilizadas
-  por otras partes del sistema.
+  Modulo con las funciones relativas a los compradores que son utilizadas
+  por otros modulos. La implementacion de las mismas utiliza modulos locales.
   """
   defdelegate process(buyer_data), to: Exchange.Buyers
 

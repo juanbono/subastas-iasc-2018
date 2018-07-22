@@ -1,7 +1,7 @@
 defmodule Exchange.Bids.Worker do
   @moduledoc """
   Cada `Exchange.Bids.Worker` mantiene el estado de una `apuesta` especifica.
-  Debe destruirse luego de pasado el tiempo especificado en la `apuesta`.
+  Debe destruirse luego de pasado el tiempo dado al momento de creacion de la `apuesta`.
   """
   use GenServer, restart: :transient
   alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}

@@ -1,12 +1,13 @@
 defmodule Exchange.Bids.Bid do
   @moduledoc """
-  Campos:
-  - :bid_id
-  - :price
-  - :close_at
-  - :json
-  - :tags
-  - :interested_buyers
+  Modelo de una `apuesta`.
+  #### Atributos:
+  - `bid_id` :: string, UUIDv4 de la apuesta. Es generador por la Exchange.
+  - `price` :: float, Precio de la apuesta.
+  - `close_at` :: integer, Numero que representa la fecha (en formato UNIX) a la que acabara la apuesta.
+  - `json` :: map<string, string>, Mapa que representa un json con informacion sobre la apuesta.
+  - `tags` :: [string], Lista de tags de la apuesta.
+  - `interested_buyers` :: [string], Lista con los nombres de los compradores interesados. Este campo no es necesario me parece.
   """
 
   @enforce_keys [:price, :close_at, :json, :tags, :bid_id, :interested_buyers]

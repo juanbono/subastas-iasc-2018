@@ -1,6 +1,10 @@
 defmodule Exchange.Buyers.Buyer do
   @moduledoc """
   Modelo de un comprador.
+  #### Atributos:
+  - `ip`   :: string, Direccion IP del comprador.
+  - `name` :: string, Nombre del comprador, debe ser unico.
+  - `tags` :: [string], Lista de tags que le interesan al comprador. Este solo sera notificado por las apuestas que le interesan.
   """
   alias Exchange.Buyers
 
@@ -23,6 +27,10 @@ defmodule Exchange.Buyers.Buyer do
   Crea un `comprador` vacio.
   """
   def empty(), do: %__MODULE__{ip: nil, name: nil, tags: nil}
+
+  ##################
+  ## Validaciones ##
+  ##################
 
   defp check_ip({:error, _reason} = err, _params), do: err
 
