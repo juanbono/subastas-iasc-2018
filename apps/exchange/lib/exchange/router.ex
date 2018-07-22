@@ -1,4 +1,7 @@
 defmodule Exchange.Router do
+  @moduledoc """
+  Modulo con los endpoints que expone la Exchange al exterior.
+  """
   use Plug.Router
   import Exchange.Utils.Router
 

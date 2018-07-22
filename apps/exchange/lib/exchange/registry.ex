@@ -1,6 +1,6 @@
 defmodule Exchange.Registry do
   @moduledoc """
-  Registro de la Exchange.
+  Registro distribuido de la Exchange.
   """
   alias Exchange.{Buyers, Bids}
 
