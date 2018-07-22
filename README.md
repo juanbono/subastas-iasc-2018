@@ -18,10 +18,10 @@ Es la interfaz del sistema con los compradores, se encarga de recibir:
 Para luego redirigirlas a los sistemas internos para su procesamiento.
 
 ### Buyers
-Sistema interno que se encarga de mantener el estado de los compradores. 
+Se encarga de mantener el estado de los compradores. 
 
 ### Bids
-Sistema interno que se encarga de mantener el estado de las apuestas, validar las ofertas, etc.
+Se encarga de mantener el estado de las apuestas, validar las ofertas, etc.
 
 ### Client
 Cliente de prueba que simula un cliente real.
