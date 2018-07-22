@@ -23,7 +23,7 @@ defmodule Exchange.Registry do
     with bid2 <- Map.put(bid, :bid_id, UUID.uuid4(:hex)),
          {:ok, pid} <- Swarm.register_name(bid2.bid_id, Bids.Supervisor, :register, [bid2]),
          :ok <- Swarm.join(:bids, pid) do
-      {:ok, bid}
+      {:ok, bid2}
     else
       {:error, _reason} = err ->
         err
