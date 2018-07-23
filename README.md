@@ -1,12 +1,12 @@
 # Subastas - IASC 2018
 
+[Trabajo Practico](https://docs.google.com/document/d/19LNOQ6UVRD1bX99NxAA7DfSlM4BvavbCQtwrhkj7U8c/edit) de la materia Implementación de Arquitecturas Concurrentes de Software.
+
 ## Integrantes:
 
 - Matias Mangiantini
 - Juan Bono
 - Kevin Mormandi
-
-[Trabajo Practico](https://docs.google.com/document/d/19LNOQ6UVRD1bX99NxAA7DfSlM4BvavbCQtwrhkj7U8c/edit) de la materia Implementación de Arquitecturas Concurrentes de Software.
 
 ## Partes del sistema:
 ![Arbol de supervision](/docs/exchange_diagram.png)
