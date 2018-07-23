@@ -3,8 +3,12 @@ defmodule Exchange.Bids.Worker do
   Cada `Exchange.Bids.Worker` mantiene el estado de una `apuesta` especifica.
   Debe destruirse luego de pasado el tiempo dado al momento de creacion de la `apuesta`.
   """
+
   use GenServer, restart: :transient
+
+  alias :mnesia, as: Mnesia
   alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
+
   require Logger
 
   #######################
@@ -17,7 +21,6 @@ defmodule Exchange.Bids.Worker do
   def init([%Bid{} = bid]) do
     new_bid =
       bid
-      |> Map.put(:interested_buyers, MapSet.new())
       |> schedule_timeout()
 
     {:ok, new_bid}
@@ -69,7 +72,6 @@ defmodule Exchange.Bids.Worker do
       close_at: state.close_at,
       json: state.json,
       tags: state.tags,
-      interested_buyers: MapSet.put(state.interested_buyers, offer.buyer),
       winner: offer.buyer,
       state: "update"
     }
@@ -78,13 +80,43 @@ defmodule Exchange.Bids.Worker do
   end
 
   def handle_cast({:cancel}, state) do
-    Buyers.Local.notify_buyers(:cancelled, %{state | state: "cancelled"})
+    new_bid = %{state | state: "cancelled"}
+
+    Mnesia.transaction(fn ->
+      Mnesia.write({
+        :bid_table,
+        new_bid.bid_id,
+        new_bid.price,
+        new_bid.close_at,
+        new_bid.json,
+        new_bid.tags,
+        new_bid.winner,
+        new_bid.state
+      })
+    end)
+
+    Buyers.Local.notify_buyers(:cancelled, new_bid)
 
     Process.exit(self(), :normal)
   end
 
   def handle_info(:finalize, state) do
-    Buyers.Local.notify_buyers(:finalized, %{state | state: "finalized"})
+    new_bid = %{state | state: "finalized"}
+
+    Mnesia.transaction(fn ->
+      Mnesia.write({
+        :bid_table,
+        new_bid.bid_id,
+        new_bid.price,
+        new_bid.close_at,
+        new_bid.json,
+        new_bid.tags,
+        new_bid.winner,
+        new_bid.state
+      })
+    end)
+
+    Buyers.Local.notify_buyers(:finalized, new_bid)
 
     Process.exit(self(), :normal)
   end

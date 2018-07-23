@@ -20,3 +20,9 @@ erl_crash.dump
 *.ez
 
 .elixir_ls
+
+# Mnesia files
+*.LOG
+*.DAT
+*.DCD
+*.DCL
