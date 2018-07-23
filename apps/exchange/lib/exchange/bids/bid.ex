@@ -7,16 +7,14 @@ defmodule Exchange.Bids.Bid do
   - `close_at` :: integer, Numero que representa la fecha (en formato UNIX) a la que acabara la apuesta.
   - `json` :: map<string, string>, Mapa que representa un json con informacion sobre la apuesta.
   - `tags` :: [string], Lista de tags de la apuesta.
-  - `interested_buyers` :: [string], Lista con los nombres de los compradores interesados. Este campo no es necesario me parece.
   """
 
-  @enforce_keys [:price, :close_at, :json, :tags, :bid_id, :interested_buyers]
+  @enforce_keys [:price, :close_at, :json, :tags, :bid_id]
   defstruct bid_id: nil,
             price: nil,
             close_at: nil,
             json: nil,
             tags: nil,
-            interested_buyers: nil,
             winner: nil,
             state: nil
 
@@ -43,7 +41,6 @@ defmodule Exchange.Bids.Bid do
       close_at: nil,
       json: nil,
       tags: nil,
-      interested_buyers: nil,
       state: "new"
     }
 

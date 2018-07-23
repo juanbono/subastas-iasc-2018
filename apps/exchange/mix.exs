@@ -30,6 +30,7 @@ defmodule Exchange.MixProject do
         :parse_trans,
         :swarm,
         :libcluster,
+        :mnesiam,
         :timex
       ],
       mod: {Exchange.Application, []}
@@ -45,6 +46,7 @@ defmodule Exchange.MixProject do
       {:httpoison, "~> 1.2.0"},
       {:amnesia, "~> 0.2.7"},
       {:libcluster, "~> 3.0.2"},
+      {:mnesiam, "~> 0.1.1"},
       {:swarm, "~> 3.3.1"},
       {:credo, "~> 0.9.3", only: [:dev, :test], runtime: false},
       {:elixir_uuid, "~> 1.2"},
