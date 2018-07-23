@@ -1,6 +1,10 @@
 defmodule Exchange.Bids.Offer do
   @moduledoc """
-  Modelo de una oferta.
+  Modelo de una oferta. Las ofertas son actualizaciones que se realizan a las `apuestas`.
+  #### Atributos:
+  - `bid_id` :: string, ID de la apuesta, entregado por la Exchange en formato UUIDv4.
+  - `price`  :: float, Precio de la oferta. Debe ser mayor al precio actual de la `subasta`.
+  - `buyer`  :: string, Nombre del `comprador` que esta realizando la oferta.
   """
   alias Exchange.{Bids, Bids.Bid, Bids.Interfaces.Buyers}
 

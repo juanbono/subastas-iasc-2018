@@ -28,6 +28,10 @@ defmodule Exchange.Buyers do
     end
   end
 
+  @doc """
+  Dado un `evento` ocurrido a una `apuesta`, notifica a todos los compradores de su ocurrencia.
+  Cada comprador individualmente decide si hara algo al respecto o no.
+  """
   def notify_buyers(:new, bid) do
     Buyers.Supervisor.current_buyers()
     |> Enum.each(fn pid -> Buyers.Worker.notify_new(pid, bid) end)

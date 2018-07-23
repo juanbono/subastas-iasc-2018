@@ -1,6 +1,6 @@
 defmodule Exchange do
   @moduledoc """
-  Modulo interfaz de toda la exchange.
+  Modulo interfaz de toda la Exchange.
   """
   alias Exchange.Interfaces.{Buyers, Bids}
 
