@@ -39,7 +39,10 @@ $ kubectl get pods
 $ minikube dashboard --logtostderr --v=2
 ```
 
-
+6. Levantar el load balancer
+```
+$ kubectl create -f k8s/exchange-service.yaml
+```
 
 ## Crear un registry local y pullear la imagen desde ahi
 ```

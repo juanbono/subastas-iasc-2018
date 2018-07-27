@@ -1,6 +1,6 @@
 defmodule Mnesiam.Support.BidStore do
   @moduledoc """
-  Sample store implementation
+  Bid Store implementation
   """
 
   alias :mnesia, as: Mnesia
@@ -13,11 +13,9 @@ defmodule Mnesiam.Support.BidStore do
   def init_store do
     Mnesia.create_table(
       @table,
-      [
-        ram_copies: [Node.self()],
-        type: :set,
-        attributes: [:bid_id, :price, :close_at, :json, :tags, :winner, :state]
-      ]
+      ram_copies: [Node.self()],
+      type: :set,
+      attributes: [:bid_id, :price, :close_at, :json, :tags, :winner, :state]
     )
   end
 

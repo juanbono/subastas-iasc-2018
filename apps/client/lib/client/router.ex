@@ -7,7 +7,6 @@ defmodule Client.Router do
   plug(:dispatch)
 
   post "/bids/open" do
-    # Task.async(fn -> Client.OfferLogic.process(conn.body_params) end)
     Client.handle_open(conn.body_params)
 
     conn
@@ -16,7 +15,6 @@ defmodule Client.Router do
   end
 
   post "/bids/new_offer" do
-    # Task.async(fn -> Client.OfferLogic.process(conn.body_params) end)
     Client.handle_offer(conn.body_params)
 
     conn
@@ -25,7 +23,6 @@ defmodule Client.Router do
   end
 
   post "/bids/close" do
-    # IO.inspect(conn.body_params, label: "bid finalizada, se recibio")
     Client.handle_close(conn.body_params)
 
     conn
