@@ -3,29 +3,34 @@ defmodule Client do
   Sample client.
   """
   require Integer
+  require Logger
+
+  @url "http://localhost:4000/bids/offer"
 
   def handle_open(bid_data) do
-    IO.inspect(bid_data, label: "Nueva apuesta")
+    Logger.info("Nueva apuesta: #{inspect(bid_data)}")
 
     if make_offer?(bid_data) do
-      offer = offer_params(bid_data)
-      send_offer(url(), offer)
+      bid_data
+      |> offer_params()
+      |> send_offer(@url)
     end
   end
 
   def handle_offer(bid_data) do
-    IO.inspect(bid_data, label: "Apuesta actualizada")
+    Logger.info("Apuesta actualizada: #{inspect(bid_data)}")
 
     if make_offer?(bid_data) do
-      offer = offer_params(bid_data)
-      send_offer(url(), offer)
+      bid_data
+      |> offer_params()
+      |> send_offer(@url)
     end
   end
 
   def handle_close(bid_data) do
-    IO.inspect(bid_data, label: "Apuesta terminada")
-    IO.inspect(bid_data["state"], label: "Estado")
-    IO.inspect(bid_data["winner"], label: "Ganador")
+    Logger.info("Apuesta terminada: #{inspect(bid_data)}")
+    Logger.info("Estado: #{inspect(bid_data["state"])}")
+    Logger.info("Ganador: #{inspect(bid_data["winner"])}")
   end
 
   defp client_name() do
@@ -35,8 +40,9 @@ defmodule Client do
   end
 
   defp make_offer?(bid_data) do
-    is_good_offer = Enum.member?(bid_data["tags"], "zapatos") && bid_data["price"] < 100
-    is_good_offer && Integer.is_even(:rand.uniform(2))
+    is_good_offer = Enum.member?(bid_data["tags"], "zapatos") && bid_data["price"] < 10000
+    # && Integer.is_even(:rand.uniform(2))
+    is_good_offer
   end
 
   defp offer_params(bid_data) do
@@ -47,12 +53,8 @@ defmodule Client do
     })
   end
 
-  defp send_offer(url, offer) do
-    IO.inspect(offer, label: "voy a enviar estos parametros \n")
+  defp send_offer(offer, url) do
+    Logger.info("Voy a enviar estos parametros: #{inspect(offer)}")
     spawn(fn -> HTTPoison.post!(url, offer, [{"content-type", "application/json"}]) end)
-  end
-
-  defp url() do
-    "http://localhost:4000/bids/offer"
   end
 end
