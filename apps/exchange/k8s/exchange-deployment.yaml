@@ -18,4 +18,8 @@ spec:
           env:
             - name: PORT
               value: "4000"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
 
