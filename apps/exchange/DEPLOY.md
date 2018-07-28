@@ -57,3 +57,12 @@ $ docker pull localhost:5000/exchange:release
 $ docker save exchange > exchange.tar
 $ docker image load -i exchange.tar
 ```
+
+## Eliminar permisos (RBAC)
+```
+kubectl create clusterrolebinding permissive-binding \
+  --clusterrole=cluster-admin \
+  --user=admin \
+  --user=kubelet \
+  --group=system:serviceaccounts
+```

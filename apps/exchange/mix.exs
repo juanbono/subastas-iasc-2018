@@ -45,7 +45,7 @@ defmodule Exchange.MixProject do
       {:poison, "~> 3.1"},
       {:httpoison, "~> 1.2.0"},
       {:amnesia, "~> 0.2.7"},
-      {:libcluster, "~> 3.0.2"},
+      {:libcluster, git: "https://github.com/flowerett/libcluster.git", branch: "fix_k8s_dns"},
       {:mnesiam, "~> 0.1.1"},
       {:swarm, "~> 3.3.1"},
       {:credo, "~> 0.9.3", only: [:dev, :test], runtime: false},

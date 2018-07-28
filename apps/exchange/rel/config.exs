@@ -61,6 +61,6 @@ release :exchange do
     applications: [
       :runtime_tools
     ],
-    vm_args: "./vm.args"
+    vm_args: "./rel/vm.args"
   )
 end

@@ -3,12 +3,13 @@ kind: Deployment
 metadata:
   name: exchange-deployment
 spec:
-  replicas: 2
+  replicas: 3
   template:
     metadata:
       labels:
         app: exchange
     spec:
+      serviceAccountName: exchange-service-account
       containers:
         - name: exchange
           image: exchange:release
