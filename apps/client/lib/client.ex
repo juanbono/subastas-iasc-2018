@@ -5,29 +5,35 @@ defmodule Client do
   require Integer
   require Logger
 
-  @url "http://localhost:4000/bids/offer"
+  defp url(conn) do
+    "#{System.get_env("EXCHANGE")}/bids/offer"
+  end
 
-  def handle_open(bid_data) do
+  def handle_open(conn) do
+    bid_data = conn.body_params
     Logger.info("Nueva apuesta: #{inspect(bid_data)}")
 
     if make_offer?(bid_data) do
       bid_data
       |> offer_params()
-      |> send_offer(@url)
+      |> send_offer(url(conn))
     end
   end
 
-  def handle_offer(bid_data) do
+  def handle_offer(conn) do
+    bid_data = conn.body_params
+
     Logger.info("Apuesta actualizada: #{inspect(bid_data)}")
 
     if make_offer?(bid_data) do
       bid_data
       |> offer_params()
-      |> send_offer(@url)
+      |> send_offer(url(conn))
     end
   end
 
-  def handle_close(bid_data) do
+  def handle_close(conn) do
+    bid_data = conn.body_params
     Logger.info("Apuesta terminada: #{inspect(bid_data)}")
     Logger.info("Estado: #{inspect(bid_data["state"])}")
     Logger.info("Ganador: #{inspect(bid_data["winner"])}")

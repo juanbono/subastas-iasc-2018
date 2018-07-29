@@ -39,7 +39,6 @@ config :libcluster,
     k8s_example: [
       strategy: Elixir.Cluster.Strategy.Kubernetes.DNS,
       config: [
-        # exchange-service-headless.default.svc.cluster.local",
         service: "exchange-service-headless.default.svc.cluster.local",
         application_name: "exchange",
         polling_interval: 100

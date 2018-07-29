@@ -3,23 +3,23 @@
 ###########################################
 # Comprador A 
 curl -H "Content-Type: application/json" \
-     -d '{"name": "A", "ip":"127.0.0.1:5001", "tags":["zapatos"]}' \
-     http://localhost:4000/buyers
+     -d '{"name": "A", "ip":"192.168.1.111:5001", "tags":["zapatos"]}' \
+     <reemplazar>/buyers
 
 # Comprador B
 curl -H "Content-Type: application/json" \
      -d '{"name": "B", "ip":"127.0.0.1:5002", "tags":["zapatos", "joyas"]}' \
-     http://localhost:4000/buyers
+    <reemplazar>/buyers
 
 ##########################################
 ###### Requests para probar /bids ########
 ##########################################
 
 curl -H "Content-Type: application/json" \
-     -d '{"tags":["zapatos"], "price": 2.0, "close_at": <Reemplazar>, "json": {"id": 12, "name": "mimisho"}}' \
-     http://localhost:4000/bids
+     -d '{"tags":["zapatos"], "price": 2.0, "close_at": <reemplazar>, "json": {"id": 12, "name": "mimisho"}}' \
+     <reemplazar>/bids
 
 # request para probar actualizacion de bids
 curl -H "Content-Type: application/json" \
-     -d '{"buyer": "A", "price": 3.0, "bid_id": "d0a91a9e-8332-11e8-a88b-e8039a53f132"}' \
-     http://localhost:4000/bids/offer
+     -d '{"buyer": "A", "price": 3.0, "bid_id": <reemplazar>}' \
+     <reemplazar>/bids/offer
