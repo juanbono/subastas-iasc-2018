@@ -57,6 +57,7 @@ $ docker pull localhost:5000/exchange:release
 $ docker save exchange > exchange.tar
 $ docker image load -i exchange.tar
 ```
+kubectl run exchange --image=exchange:release --restart=Never --tty -i --env "POD_IP=$(kubectl get pod exchange -o go-template='{{.status.podIP}}')"
 
 ## Eliminar permisos (RBAC)
 ```
