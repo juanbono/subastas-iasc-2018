@@ -6,9 +6,8 @@ defmodule Exchange.Bids.Worker do
 
   use GenServer, restart: :transient
 
-  alias :mnesia, as: Mnesia
   alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
-
+  alias Mnesiam.Support.BidStore
   require Logger
 
   #######################
@@ -66,15 +65,7 @@ defmodule Exchange.Bids.Worker do
   def handle_call({:get_state}, _from, state), do: {:reply, {:ok, state}, state}
 
   def handle_call({:update, offer}, _from, state) do
-    new_state = %Bid{
-      bid_id: state.bid_id,
-      price: offer.price,
-      close_at: state.close_at,
-      json: state.json,
-      tags: state.tags,
-      winner: offer.buyer,
-      state: "update"
-    }
+    new_state = %Bid{state | price: offer.price, winner: offer.buyer, state: "update"}
 
     {:reply, new_state, new_state}
   end
@@ -115,18 +106,7 @@ defmodule Exchange.Bids.Worker do
   def handle_cast({:cancel}, state) do
     new_bid = %{state | state: "cancelled"}
 
-    Mnesia.transaction(fn ->
-      Mnesia.write({
-        :bid_table,
-        new_bid.bid_id,
-        new_bid.price,
-        new_bid.close_at,
-        new_bid.json,
-        new_bid.tags,
-        new_bid.winner,
-        new_bid.state
-      })
-    end)
+    BidStore.store(new_bid)
 
     Buyers.Local.notify_buyers(:cancelled, new_bid)
 
@@ -136,18 +116,7 @@ defmodule Exchange.Bids.Worker do
   def handle_info(:finalize, state) do
     new_bid = %{state | state: "finalized"}
 
-    Mnesia.transaction(fn ->
-      Mnesia.write({
-        :bid_table,
-        new_bid.bid_id,
-        new_bid.price,
-        new_bid.close_at,
-        new_bid.json,
-        new_bid.tags,
-        new_bid.winner,
-        new_bid.state
-      })
-    end)
+    BidStore.store(new_bid)
 
     Buyers.Local.notify_buyers(:finalized, new_bid)
 
