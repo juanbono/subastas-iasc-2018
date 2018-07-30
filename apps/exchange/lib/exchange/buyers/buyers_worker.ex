@@ -97,8 +97,8 @@ defmodule Exchange.Buyers.Worker do
   # so make sure to design your processes around this caveat if you
   # wish to hand off state like this.
   def handle_cast({:swarm, :end_handoff, some_state}, sarasa) do
-    IO.inspect(sarasa, label: "sarasa")
-    IO.inspect(some_state, label: "End Handoff: ")
+    Logger.info("Sarasa: #{inspect(sarasa)}")
+    Logger.info("End Handoff: #{inspect(some_state)}")
     {:noreply, some_state}
   end
 
@@ -119,7 +119,7 @@ defmodule Exchange.Buyers.Worker do
   #   - `:ignore`, to leave the process running on its current node
   #
   def handle_call({:swarm, :begin_handoff}, _from, some_state) do
-    IO.inspect(some_state, label: "Begin Handoff: state")
+    Logger.info("Begin Handoff: #{inspect(some_state)}")
     {:reply, {:resume, some_state}, some_state}
   end
 
@@ -128,6 +128,24 @@ defmodule Exchange.Buyers.Worker do
 
   def handle_call({:name_is_in, list}, _from, %Buyer{name: name} = state),
     do: {:reply, Enum.member?(list, name), state}
+
+  def handle_info(:timeout, {name, delay}) do
+    IO.puts("#{inspect(name)} says hi!")
+    Process.send_after(self(), :timeout, delay)
+    {:noreply, {name, delay}}
+  end
+
+  # mensaje recibido cuando el proceso esta a punto de ser movido a otro
+  # nodo del cluster.
+  def handle_info({:swarm, :die}, state) do
+    Logger.info("Swarm die msg received!")
+    Logger.info("State before death: #{inspect(state)}")
+    {:stop, :shutdown, state}
+  end
+
+  def handle_info(msg, _state) do
+    Logger.info("Mensaje desconocido: #{inspect(msg)}")
+  end
 
   ##########################
   ## Funciones Auxiliares ##
@@ -157,17 +175,5 @@ defmodule Exchange.Buyers.Worker do
       close_at: bid.close_at,
       state: bid.state
     }
-  end
-
-  def handle_info(:timeout, {name, delay}) do
-    IO.puts("#{inspect(name)} says hi!")
-    Process.send_after(self(), :timeout, delay)
-    {:noreply, {name, delay}}
-  end
-
-  # mensaje recibido cuando el proceso esta a punto de ser movido a otro
-  # nodo del cluster.
-  def handle_info({:swarm, :die}, state) do
-    {:stop, :shutdown, state}
   end
 end
