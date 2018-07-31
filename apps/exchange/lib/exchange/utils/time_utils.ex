@@ -32,4 +32,9 @@ defmodule Exchange.Utils.Time do
     |> Timex.shift(hours: amount)
     |> DateTime.to_unix()
   end
+
+  def add_sec(date, amount) do
+    date
+    |> Timex.shift(seconds: amount)
+  end
 end

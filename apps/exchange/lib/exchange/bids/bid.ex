@@ -7,16 +7,18 @@ defmodule Exchange.Bids.Bid do
   - `close_at` :: integer, Numero que representa la fecha (en formato UNIX) a la que acabara la apuesta.
   - `json` :: map<string, string>, Mapa que representa un json con informacion sobre la apuesta.
   - `tags` :: [string], Lista de tags de la apuesta.
+  - `timeout` :: [integer], utilizado para saber si el bid debe cancelarse.
   """
 
-  @enforce_keys [:price, :close_at, :json, :tags, :bid_id]
+  @enforce_keys [:price, :close_at, :json, :tags, :bid_id, :timeout]
   defstruct bid_id: nil,
             price: nil,
             close_at: nil,
             json: nil,
             tags: nil,
             winner: nil,
-            state: nil
+            state: nil,
+            timeout: 0
 
   @doc """
   Smart constructor para las apuestas.
@@ -41,7 +43,8 @@ defmodule Exchange.Bids.Bid do
       close_at: nil,
       json: nil,
       tags: nil,
-      state: "new"
+      state: "new",
+      timeout: 0
     }
 
   defp check_price({:error, _reason} = err, _params), do: err

@@ -6,7 +6,7 @@ defmodule Exchange.Bids.Worker do
 
   use GenServer, restart: :transient
 
-  alias Exchange.{Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
+  alias Exchange.{Utils, Bids, Bids.Bid, Bids.Offer, Bids.Interfaces.Buyers}
   alias Mnesiam.Support.BidStore
   require Logger
 
@@ -113,7 +113,7 @@ defmodule Exchange.Bids.Worker do
     Process.exit(self(), :normal)
   end
 
-  def handle_info(:finalize, state) do
+  def handle_info(:finalize, %Bid{timeout: timeout} = state) when timeout - 1 == 0 do
     new_bid = %{state | state: "finalized"}
 
     BidStore.store(new_bid)
@@ -121,6 +121,13 @@ defmodule Exchange.Bids.Worker do
     Buyers.Local.notify_buyers(:finalized, new_bid)
 
     Process.exit(self(), :normal)
+  end
+
+  def handle_info(:finalize, %Bid{timeout: timeout} = state) do
+    new_close_at = Utils.Time.add_sec(state.close_at, 5)
+    new_bid = %{state | close_at: new_close_at, timeout: timeout - 1}
+
+    {:noreply, new_bid}
   end
 
   # mensaje recibido cuando el proceso esta a punto de ser movido a otro
@@ -141,7 +148,8 @@ defmodule Exchange.Bids.Worker do
 
   defp schedule_timeout(bid) do
     duration = DateTime.diff(bid.close_at, DateTime.utc_now()) * 1000
+    new_bid = %Bid{bid | timeout: bid.timeout + 1}
     Process.send_after(self(), :finalize, duration)
-    bid
+    new_bid
   end
 end

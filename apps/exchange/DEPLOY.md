@@ -7,7 +7,7 @@ $ env MIX_ENV=docker mix release --env=docker
 
 (OPCIONAL) Probar la release
 ```
-$ REPLACE_OS_VARS=true PORT=4000 ./_build/prod/rel/exchange/bin/exchange foreground
+$ REPLACE_OS_VARS=true PORT=4000 ./_build/docker/rel/exchange/bin/exchange foreground
 ```
 
 2. Crear la imagen de docker

@@ -151,7 +151,7 @@ defmodule Exchange.Buyers.Worker do
   ## Funciones Auxiliares ##
   ##########################
 
-  defp make_body(bid), do: Poison.encode!(encode_bid(bid))
+  defp make_body(bid), do: bid |> encode_bid() |> Poison.encode!()
 
   defp send_request(body, url) do
     case HTTPoison.post(url, body, [{"content-type", "application/json"}]) do
