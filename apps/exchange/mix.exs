@@ -26,7 +26,6 @@ defmodule Exchange.MixProject do
         :cowboy,
         :plug,
         :httpoison,
-        :confex,
         :parse_trans,
         :swarm,
         :libcluster,
@@ -50,7 +49,6 @@ defmodule Exchange.MixProject do
       {:swarm, "~> 3.3.1"},
       {:credo, "~> 0.9.3", only: [:dev, :test], runtime: false},
       {:elixir_uuid, "~> 1.2"},
-      {:confex, "~> 3.3.1"},
       {:distillery, "~> 1.5.3", runtime: false},
       {:timex, "~> 3.3.0"}
     ]

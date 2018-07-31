@@ -44,13 +44,11 @@ $ minikube dashboard --logtostderr --v=2
 $ kubectl create -f k8s/exchange-service.yaml
 ```
 
-<<<<<<< HEAD
 7. Obtener direccion del load balancer (para poder enviar requests)
 ```
 $ minikube service exchange-service
 ```
-=======
->>>>>>> 004723e475e1c41b8d08751cbbf52b04c369c9c7
+
 ## Crear un registry local y pullear la imagen desde ahi
 ```
 $ docker run -d -p 5000:5000 --restart=always --name registry registry:2

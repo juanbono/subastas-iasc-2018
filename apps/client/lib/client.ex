@@ -5,9 +5,7 @@ defmodule Client do
   require Integer
   require Logger
 
-  defp url(conn) do
-    "#{System.get_env("EXCHANGE")}/bids/offer"
-  end
+  @url "http://192.168.99.100:31782/bids/offer"
 
   def handle_open(conn) do
     bid_data = conn.body_params
@@ -16,7 +14,7 @@ defmodule Client do
     if make_offer?(bid_data) do
       bid_data
       |> offer_params()
-      |> send_offer(url(conn))
+      |> send_offer(@url)
     end
   end
 
@@ -28,7 +26,7 @@ defmodule Client do
     if make_offer?(bid_data) do
       bid_data
       |> offer_params()
-      |> send_offer(url(conn))
+      |> send_offer(@url)
     end
   end
 
