@@ -37,4 +37,9 @@ defmodule Exchange.Bids.Supervisor do
   def get_bids, do: Swarm.members(:bids)
 
   def number_of_bids, do: get_bids() |> Enum.count()
+
+  def broadcast_new_buyer(buyer_pid) do
+    get_bids() |>
+      Enum.each(fn bid_pid -> Exchange.Bids.Worker.notify_new_buyer(bid_pid, buyer_pid) end)
+  end
 end

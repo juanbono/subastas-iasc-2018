@@ -58,7 +58,7 @@ defmodule Client.RouterTest do
     })
 
     conn =
-      conn(:post, "/bids/new_offer", body)
+      conn(:post, "/bids/update", body)
       |> put_req_header("content-type", "application/json")
 
     conn = Client.Router.call(conn, @opts)

@@ -39,5 +39,7 @@ defmodule Mnesiam.Support.BidStore do
         bid.state
       })
     end)
+
+    bid
   end
 end

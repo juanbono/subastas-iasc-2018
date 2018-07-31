@@ -36,15 +36,9 @@ defmodule Exchange.Buyers.Worker do
 
   @doc """
   Notifica al comprador con el `pid` dado sobre
-  la cancelación de una `apuesta`.
-  """
-  def notify_cancelled(pid, bid), do: GenServer.cast(pid, {:bid_cancelled, bid})
-
-  @doc """
-  Notifica al comprador con el `pid` dado sobre
   la finalización de una `apuesta`.
   """
-  def notify_finalized(pid, bid), do: GenServer.cast(pid, {:bid_finalized, bid})
+  def bid_finalized(pid, bid), do: GenServer.cast(pid, {:bid_finalized, bid})
 
   @doc """
   Verifica si el nombre del `comprador` se encuentra dentro
@@ -58,34 +52,30 @@ defmodule Exchange.Buyers.Worker do
 
   def handle_cast({:bid_new, bid}, %Buyer{ip: ip, tags: tags} = state) do
     if has_tags_in_common?(bid.tags, tags) do
-      body = make_body(bid)
-
-      spawn(fn -> send_request(body, "#{ip}/bids/open") end)
+      bid
+        |> make_body()
+        |> send_request("#{ip}/bids/open")
     end
 
     {:noreply, state}
   end
 
-  def handle_cast({:bid_updated, bid}, %Buyer{ip: ip} = state) do
-    bid
-    |> make_body()
-    |> send_request("#{ip}/bids/new_offer")
+  def handle_cast({:bid_updated, bid}, %Buyer{ip: ip, tags: tags} = state) do
+    if has_tags_in_common?(bid.tags, tags) do
+      bid
+        |> make_body()
+        |> send_request("#{ip}/bids/update")
+    end
 
     {:noreply, state}
   end
 
-  def handle_cast({:bid_cancelled, bid}, %Buyer{ip: ip} = state) do
-    bid
-    |> make_body()
-    |> send_request("#{ip}/bids/close")
-
-    {:noreply, state}
-  end
-
-  def handle_cast({:bid_finalized, bid}, %Buyer{ip: ip} = state) do
-    bid
-    |> make_body()
-    |> send_request("#{ip}/bids/close")
+  def handle_cast({:bid_finalized, bid}, %Buyer{ip: ip, tags: tags} = state) do
+    if has_tags_in_common?(bid.tags, tags) do
+      bid
+        |> make_body()
+        |> send_request("#{ip}/bids/close")
+    end
 
     {:noreply, state}
   end

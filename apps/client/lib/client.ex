@@ -47,7 +47,6 @@ defmodule Client do
 
   defp make_offer?(bid_data) do
     is_good_offer = Enum.member?(bid_data["tags"], "zapatos") && bid_data["price"] < 10000
-    # && Integer.is_even(:rand.uniform(2))
     is_good_offer
   end
 
