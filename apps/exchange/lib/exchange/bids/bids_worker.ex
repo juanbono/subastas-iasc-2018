@@ -83,6 +83,7 @@ defmodule Exchange.Bids.Worker do
   #
   def handle_call({:swarm, :begin_handoff}, _from, some_state) do
     Logger.info("Begin Handoff: #{inspect(some_state)}")
+
     {:reply, {:resume, some_state}, some_state}
   end
 
@@ -92,10 +93,13 @@ defmodule Exchange.Bids.Worker do
   # **NOTE**: This is called *after* the process is successfully started,
   # so make sure to design your processes around this caveat if you
   # wish to hand off state like this.
-  def handle_cast({:swarm, :end_handoff, some_state}, sarasa) do
-    Logger.info("Sarasa: #{inspect(sarasa)}")
+  def handle_cast({:swarm, :end_handoff, some_state}, _) do
+    new_close_at = Utils.Time.add_sec(some_state.close_at, 5)
+    new_bid = %{some_state | close_at: new_close_at}
+
     Logger.info("End Handoff: #{inspect(some_state)}")
-    {:noreply, some_state}
+
+    {:noreply, new_bid}
   end
 
   # called when a network split is healed and the local process
@@ -130,8 +134,7 @@ defmodule Exchange.Bids.Worker do
   end
 
   def handle_info(:finalize, %Bid{timeout: timeout} = state) do
-    new_close_at = Utils.Time.add_sec(state.close_at, 5)
-    new_bid = %{state | close_at: new_close_at, timeout: timeout - 1}
+    new_bid = %{state | timeout: timeout - 1}
 
     {:noreply, new_bid}
   end
