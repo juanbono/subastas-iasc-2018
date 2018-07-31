@@ -5,9 +5,10 @@ defmodule Client do
   require Integer
   require Logger
 
-  @url "http://localhost:4000/bids/offer"
+  @url "http://192.168.99.100:31782/bids/offer"
 
-  def handle_open(bid_data) do
+  def handle_open(conn) do
+    bid_data = conn.body_params
     Logger.info("Nueva apuesta: #{inspect(bid_data)}")
 
     if make_offer?(bid_data) do
@@ -17,7 +18,9 @@ defmodule Client do
     end
   end
 
-  def handle_offer(bid_data) do
+  def handle_offer(conn) do
+    bid_data = conn.body_params
+
     Logger.info("Apuesta actualizada: #{inspect(bid_data)}")
 
     if make_offer?(bid_data) do
@@ -27,7 +30,8 @@ defmodule Client do
     end
   end
 
-  def handle_close(bid_data) do
+  def handle_close(conn) do
+    bid_data = conn.body_params
     Logger.info("Apuesta terminada: #{inspect(bid_data)}")
     Logger.info("Estado: #{inspect(bid_data["state"])}")
     Logger.info("Ganador: #{inspect(bid_data["winner"])}")
@@ -41,7 +45,6 @@ defmodule Client do
 
   defp make_offer?(bid_data) do
     is_good_offer = Enum.member?(bid_data["tags"], "zapatos") && bid_data["price"] < 10000
-    # && Integer.is_even(:rand.uniform(2))
     is_good_offer
   end
 

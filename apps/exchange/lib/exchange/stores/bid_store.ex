@@ -25,4 +25,21 @@ defmodule Mnesiam.Support.BidStore do
   def copy_store do
     Mnesia.add_table_copy(@table, Node.self(), :ram_copies)
   end
+
+  def store(bid) do
+    Mnesia.transaction(fn ->
+      Mnesia.write({
+        :bid_table,
+        bid.bid_id,
+        bid.price,
+        bid.close_at,
+        bid.json,
+        bid.tags,
+        bid.winner,
+        bid.state
+      })
+    end)
+
+    bid
+  end
 end

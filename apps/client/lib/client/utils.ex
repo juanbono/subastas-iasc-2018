@@ -1,4 +1,4 @@
-defmodule Exchange.Utils.Time do
+defmodule Client.Utils do
   @moduledoc """
   Modulo con funciones utiles para obtener el tiempo en
   formato UNIX dentro de una cantidad dada de segundos/minutos/horas.
@@ -31,10 +31,5 @@ defmodule Exchange.Utils.Time do
     DateTime.utc_now()
     |> Timex.shift(hours: amount)
     |> DateTime.to_unix()
-  end
-
-  def add_sec(date, amount) do
-    date
-    |> Timex.shift(seconds: amount)
   end
 end

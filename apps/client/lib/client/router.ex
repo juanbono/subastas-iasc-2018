@@ -7,7 +7,7 @@ defmodule Client.Router do
   plug(:dispatch)
 
   post "/bids/open" do
-    Client.handle_open(conn.body_params)
+    Client.handle_open(conn)
 
     conn
     |> put_resp_content_type("application/json")
@@ -15,7 +15,7 @@ defmodule Client.Router do
   end
 
   post "/bids/update" do
-    Client.handle_offer(conn.body_params)
+    Client.handle_offer(conn)
 
     conn
     |> put_resp_content_type("application/json")
@@ -23,7 +23,7 @@ defmodule Client.Router do
   end
 
   post "/bids/close" do
-    Client.handle_close(conn.body_params)
+    Client.handle_close(conn)
 
     conn
     |> put_resp_content_type("application/json")

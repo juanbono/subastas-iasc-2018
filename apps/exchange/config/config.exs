@@ -31,4 +31,17 @@ import_config "#{Mix.env()}.exs"
 
 config :mnesiam,
   stores: [Mnesiam.Support.BidStore],
-  table_load_timeout: 600_000 # milliseconds
+  # milliseconds
+  table_load_timeout: 600_000
+
+config :libcluster,
+  topologies: [
+    k8s_example: [
+      strategy: Elixir.Cluster.Strategy.Kubernetes.DNS,
+      config: [
+        service: "exchange-service-headless.default.svc.cluster.local",
+        application_name: "exchange",
+        polling_interval: 100
+      ]
+    ]
+  ]

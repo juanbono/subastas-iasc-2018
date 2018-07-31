@@ -60,6 +60,7 @@ release :exchange do
   set(
     applications: [
       :runtime_tools
-    ]
+    ],
+    vm_args: "./rel/vm.args"
   )
 end

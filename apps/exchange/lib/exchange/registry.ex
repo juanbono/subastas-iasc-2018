@@ -2,12 +2,12 @@ defmodule Exchange.Registry do
   @moduledoc """
   Registro distribuido de la Exchange.
   """
-  alias Exchange.{Buyers, Bids}
+  alias Exchange.Bids
 
   def start_buyer({:error, _} = error), do: error
 
   def start_buyer(buyer) do
-    {:ok, pid} = Swarm.register_name(buyer.name, Buyers.Supervisor, :register, [buyer])
+    {:ok, pid} = Swarm.register_name(buyer.name, Exchange.Buyers.Supervisor, :register, [buyer])
 
     Swarm.join(:buyers, pid)
     {:ok, pid}
