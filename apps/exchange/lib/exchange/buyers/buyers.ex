@@ -17,7 +17,9 @@ defmodule Exchange.Buyers do
   Registra un comprador en el sistema. En caso de recibir un error, lo devuelve.
   """
   def register(buyer) do
-    with {:ok, _pid} <- Exchange.Registry.start_buyer(buyer) do
+    with {:ok, pid} <- Exchange.Registry.start_buyer(buyer) do
+      Exchange.Bids.Supervisor.broadcast_new_buyer(pid)
+
       {:ok, number_of_buyers()}
     else
       {:error, _reason} = err ->
@@ -42,14 +44,9 @@ defmodule Exchange.Buyers do
     |> Enum.each(fn pid -> Buyers.Worker.notify_update(pid, bid) end)
   end
 
-  def notify_buyers(:cancelled, bid) do
-    Buyers.Supervisor.current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify_cancelled(pid, bid) end)
-  end
-
   def notify_buyers(:finalized, bid) do
     Buyers.Supervisor.current_buyers()
-    |> Enum.each(fn pid -> Buyers.Worker.notify_finalized(pid, bid) end)
+    |> Enum.each(fn pid -> Buyers.Worker.bid_finalized(pid, bid) end)
   end
 
   @doc """

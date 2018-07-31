@@ -14,7 +14,7 @@ defmodule Client.Router do
     |> send_resp(200, Poison.encode!(%{message: "Ok"}))
   end
 
-  post "/bids/new_offer" do
+  post "/bids/update" do
     Client.handle_offer(conn.body_params)
 
     conn

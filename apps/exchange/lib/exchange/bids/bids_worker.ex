@@ -39,6 +39,10 @@ defmodule Exchange.Bids.Worker do
   def get_state({:error, _} = error), do: error
   def get_state(pid), do: GenServer.call(pid, {:get_state})
 
+  def notify_new_buyer(pid, buyer_pid) do
+    GenServer.cast(pid, {:notify_new_buyer, buyer_pid})
+  end
+
   @doc """
   Actualiza los datos de la `apuesta` con la `oferta` dada.
   """
@@ -79,50 +83,57 @@ defmodule Exchange.Bids.Worker do
     {:reply, new_state, new_state}
   end
 
+  def handle_cast({:notify_new_buyer, buyer_pid}, state) do
+    Exchange.Buyers.Worker.notify_update(buyer_pid, state)
+
+    {:noreply, state}
+  end
+
   def handle_cast({:cancel}, state) do
-    new_bid = %{state | state: "cancelled"}
-
-    Mnesia.transaction(fn ->
-      Mnesia.write({
-        :bid_table,
-        new_bid.bid_id,
-        new_bid.price,
-        new_bid.close_at,
-        new_bid.json,
-        new_bid.tags,
-        new_bid.winner,
-        new_bid.state
-      })
-    end)
-
-    Buyers.Local.notify_buyers(:cancelled, new_bid)
+    %{state | state: "cancelled"}
+      |> persist
+      |> notify_buyers(:finalized)
 
     Process.exit(self(), :normal)
   end
 
   def handle_info(:finalize, state) do
-    new_bid = %{state | state: "finalized"}
-
-    Mnesia.transaction(fn ->
-      Mnesia.write({
-        :bid_table,
-        new_bid.bid_id,
-        new_bid.price,
-        new_bid.close_at,
-        new_bid.json,
-        new_bid.tags,
-        new_bid.winner,
-        new_bid.state
-      })
-    end)
-
-    Buyers.Local.notify_buyers(:finalized, new_bid)
+    %{state | state: "finalized"}
+      |> persist
+      |> notify_buyers(:finalized)
 
     Process.exit(self(), :normal)
   end
 
   def handle_info(msg, _state) do
     Logger.info("Received unknown message: #{inspect(msg)}")
+  end
+
+  ##########################
+  ## Funciones Auxiliares ##
+  ##########################
+
+  def persist(bid) do
+    Mnesia.transaction(fn ->
+      Mnesia.write({
+        :bid_table,
+        bid.bid_id,
+        bid.price,
+        bid.close_at,
+        bid.json,
+        bid.tags,
+        bid.winner,
+        bid.state
+      })
+    end)
+
+    bid
+  end
+
+  def notify_buyers(bid, status) do
+    Buyers.Local.notify_buyers(status, bid)
+
+    bid
   end
 
   def schedule_timeout(bid) do
